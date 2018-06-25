@@ -1,0 +1,103 @@
+@media screen and (max-width: 692px) {
+  .doc-help-button {
+    margin: 0 auto;
+  }
+
+  .documents-container-categories,
+  .documents-container-title,
+  .documents-container-help,
+  .documents-container-description {
+    text-align: center;
+  }
+
+  .documents-pdf-date {
+    display: none;
+  }
+
+  .documents-pdf-name {
+    width: 90%;
+  }
+}
+
+@media screen and (max-width: 1408px) {
+  .documents-search-background {
+    width: 70%;
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .documents-search-background {
+    width: 100%;
+    border-radius: 0;
+    height: 280px;
+  }
+
+  .documents-search-container {
+    margin-top: 0;
+    top: 4rem;
+    height: calc(450px - 4rem);
+    text-align: center;
+    line-height: normal;
+  }
+
+  .searchbar-field2,
+  .searchbar-field-faq {
+    width: 75% !important;
+    margin: 1rem 0 1rem 0;
+  }
+
+  .documents-search-description {
+    margin-top: 1rem;
+  }
+
+  .chosen-container-single {
+    width: 75% !important;
+  }
+
+  .chosen-single {
+    width: 100% !important;
+  }
+
+  .category-options-spans {
+    line-height: 2.75rem;
+  }
+
+  .category-option-1 {
+    width: 5rem;
+  }
+
+  .category-option-2 {
+    width: 7rem;
+  }
+
+  .category-option-3 {
+    width: 6rem;
+  }
+
+  .faq-container-categories {
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 770px) {
+  .faq-search-background {
+    width: 100%;
+    border-radius: 0;
+    height: 190px;
+  }
+
+  .otrs-container {
+    padding-right: 0;
+    text-align: center;
+  }
+
+  .otrs-button {
+    float: none;
+    margin: 0 auto;
+  }
+
+  .otrs-description {
+    padding: 3rem 2rem 2rem 2rem;
+  }
+}
+

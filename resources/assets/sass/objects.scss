@@ -1,0 +1,128 @@
+.wallpaper-object {
+	/* Set a specific height */
+	min-height: 440px; 
+
+	/* Create the parallax scrolling effect */
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.objects-search-wrap{ 
+	display: inline-flex
+}
+
+.documents-search-wrap {
+	display: inline-flex;
+}
+
+#documents_search_chosen_chosen {
+	width: 260px !important;
+	margin-right: 30px;
+}
+
+.objects-search-container {
+	margin-top: 4rem;
+	display: block !important;
+	padding-top: 2rem;
+	line-height: 2.7rem;
+}
+
+.objects-search-background {
+	position: absolute;
+	background: rgba(255, 255, 255, 0.78);
+	height: 175px;
+	width: 50%;
+	top: 4rem;
+	border-radius: 0 0 20px 0;
+	padding: 1rem 3rem;
+}
+
+.chosen-drop {
+	text-align: left;
+}
+
+.objects-search-title {
+	font-size: 40px;
+	margin-bottom:0
+}
+
+.searchbar-document-wrap {
+	 text-align: left;
+    right: 1.9rem;
+    background: white;
+    margin-top: 3rem;
+
+}
+
+.searchbar-field-objects {
+	text-align: left;
+	border-radius: 6rem;
+	border: 1px solid rgb(210, 210, 210);
+	padding: .55rem 2rem .55rem 1rem;
+	width: 19rem;
+	transition: .5s;	
+	height: 2.6rem;
+}
+
+.searchbar-span-objects {
+	color: black;
+	cursor: pointer;
+	position: relative;
+	top: 0;
+	right: 2rem;
+}
+
+.objects-container {
+	margin-top: 3rem;
+	margin-bottom: 3rem;
+}
+
+.home-objects-header {
+	display: flex;
+}
+
+.home-objects-button {
+	text-align: right;
+	margin-top: 1.7rem;
+	padding-right: 1rem;
+}
+
+.home-objects-button a {
+	color: #F29400;
+}
+
+.object-subcategory-div {
+	display: none;
+}
+
+.object-subcategory-div i {
+	padding-left: 20px;
+}
+
+.object-categories-spans div {
+	cursor: pointer;
+}
+
+.object-category-span {
+	color: #F29400;
+}
+
+.object-title-niederlassungen {
+	color: #F29400;
+}
+
+.loading-container {
+	width: 100%;
+}
+
+.load-container .is-loading {
+	border: none; 
+	font-size: 50px; 
+	width: 100%
+}
+
+.documents-search-description {
+	font-size: 20px; 
+	margin-bottom: 10px;
+}

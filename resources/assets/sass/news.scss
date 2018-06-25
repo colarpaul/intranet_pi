@@ -1,0 +1,442 @@
+
+
+.new-header {
+	display: flex;
+}
+
+.new-title {
+	width: 70%;
+	text-align: left;
+	font-size: 28px;
+	margin-bottom: 2rem;
+}
+
+.new-subtitle, h3, .h3 {
+	margin-bottom: 2rem;
+    font-weight: 600;
+    font-size: 20px;
+    color: #333;
+}
+.new-description, h3, .h3 {
+    margin-bottom: 1rem;
+    margin-top:2rem;
+}
+
+.new-date {
+    width: 30%;
+    text-align: right;
+    font-size: 20px;
+    color: #888;
+}
+
+.new-description {
+	font-size: 18px;
+    line-height: 1.7rem; 
+    word-wrap: break-word;
+    color: #333;
+}
+.new-description p{
+    margin-bottom: 1rem;
+}
+.new-description a, .new-subtitle a{
+    color: #F29400; 
+}
+.new-description ul{
+    list-style-type: disc;
+    list-style-position: outside;
+    margin-left: 1.5rem;
+    margin-bottom: 2rem;
+}
+.new-description ul li{
+    margin-bottom: .5rem;
+}
+.new-image {
+    background-repeat: no-repeat !important;
+    background-size: contain !important;
+    background-position: top !important;
+     min-height: 300px;
+    width: 100%;
+}
+
+.new-image-desc {
+	margin-top: 1rem;
+	font-size: 13px;
+}
+
+.news-image-wrap {
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    height: auto;
+    width: 100%;
+}
+
+.news-image .news-image-wrap {
+	min-height: 190px;
+	max-height: 190px;
+}
+
+/*.news-desc-wrap {
+	position: relative;
+}*/
+
+.read-more-button {
+	position: absolute;
+	bottom: 0;
+}
+
+.wallpaper-news {
+    /* The image used */
+    background-image: url("/images/bg_intern.jpg");
+
+    /* Set a specific height */
+    min-height: 440px; 
+
+    /* Create the parallax scrolling effect */
+    background-position: right;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.news-search-background {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.78);
+    height: 200px;
+    width: 38%;
+    top: 4rem;
+    border-radius: 0 0 20px 0;
+}
+
+.news-container {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+.news-result {
+    display: flex;
+}
+
+.news-button {
+    position: relative;
+    bottom: 0;
+    background: #F29400; 
+    display: table;
+    padding: 10px 15px 7px; 
+    color: white;
+    margin-top:1rem;
+    line-height: .8rem;
+}
+
+.news-message span {
+    color: #888;
+    font-size: 20px;
+}
+
+.news-title {
+    font-size: 24px;
+    font-weight: 500;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+.news-result {
+    margin-top: 2rem;
+    border-bottom: 1px solid #888;
+    padding-bottom: 2rem;
+}
+
+.news-image-1 {
+    background: url(/images/news/PI_Erste_Wohnmesse_016.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 350px;
+    height: 200px;
+    margin-right: 2rem;
+    background-position-y: 10%;
+}
+
+.news-image-2 {
+    background: url(/images/news/img1.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 350px;
+    height: 200px;
+    margin-right: 2rem;
+    background-position-y: 10%;
+}
+
+.news-image-3 {
+    background: url(/images/news/20150327_Henning_Niewerth_RGB.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 350px;
+    height: 200px;
+    margin-right: 2rem;
+    background-position-y: 10%;
+}
+
+.news-image-4 {
+    background: url(/images/news/PROJECT_Immobilien_Juliane_Mann.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 350px;
+    height: 200px;
+    margin-right: 2rem;
+    background-position-y: 10%;
+}
+
+.news-image-5 {
+    background: url(/images/news/img2.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 350px;
+    height: 200px;
+    margin-right: 2rem;
+    background-position-y: 10%;
+}
+
+.new-container {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+.new-container .buttons{
+    float: right;
+}
+
+.back-button {
+    position: absolute;
+    top: 1.5rem;
+    left: -5rem;
+}
+
+.back-button {
+    color: #F29400;
+    border: 3px solid #F29400;
+    width: 50px;
+    height: 50px;
+}
+
+.back-button .button-new {
+    margin-bottom: -10px;
+    font-size: 60px;
+    text-align: center;
+    margin-top: -29px;
+    color: #F29400 !important;
+}
+
+.back-button .text {
+    color: #F29400 !important;
+    font-size: 12px;
+    text-align: center;
+}
+
+.ba_to_over {
+    position: absolute;
+    left: -50px;
+    top: 0px;
+}
+
+.ba_to_over .circle {
+    border: 3px solid #333333;
+    float: left;
+    width: 70px;
+    height: 70px;
+    border-radius: 40px;
+    color: #333333;
+    margin-bottom: 5px;
+}
+
+.ba_to_over i {
+    position: absolute;    
+    color: #333333;
+    top: 16px;
+    left: 15px;
+    font-size: 44px;
+}
+
+.ba_to_over p {
+    width: 70px;
+    font-size: 14px;
+    padding: 0;
+    text-align: center;
+    color: #4a4a4a !important;
+}
+
+.news-desc-wrap a {
+    color: #F29400 !important;
+    font-weight: bold;
+}
+
+.l-container {
+    margin: auto;
+}
+
+.l-radio {
+    display: flex;
+}
+
+.c-radio {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.c-radio input[type=radio] {
+    position: relative;
+    opacity: 0;
+    z-index: 1;
+    height: 25px;
+    width: 25px;
+    margin: 0;
+}
+.c-radio input[type=radio]:checked + .check_mark {
+    border: 2px solid #F29400;
+}
+.c-radio input[type=radio]:checked + .check_mark:after {
+    display: block;
+}
+.c-radio .check_mark {
+    height: 25px;
+    width: 25px;
+    background-color: #fff;
+    border: 2px solid #9B9B9B;
+    border-radius: 50%;
+    position: absolute;
+    left: 0;
+}
+.c-radio .check_mark:after {
+    display: none;
+    position: absolute;
+    content: "";
+    width: 10px;
+    height: 10px;
+    top: 6px;
+    left: 6px;
+    background: #F29400;
+    border-radius: 50%;
+}
+.c-radio label {
+    font-size: 18px;
+    line-height: 2.6rem;
+    margin-left: 10px;
+}
+
+.l-checkbox {
+    display: flex;
+}
+
+.c-checkbox {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+.c-checkbox input[type=checkbox] {
+    position: relative;
+    opacity: 0;
+    z-index: 1;
+    height: 25px;
+    width: 25px;
+    margin: 0;
+}
+.c-checkbox input[type=checkbox]:checked + .check_mark {
+    border: 2px solid #F29400;
+}
+.c-checkbox input[type=checkbox]:checked + .check_mark:after {
+    display: block;
+}
+.c-checkbox .check_mark {
+    height: 25px;
+    width: 25px;
+    background-color: #fff;
+    border: 2px solid #9B9B9B;
+    position: absolute;
+    left: 0;
+}
+.c-checkbox .check_mark:after {
+    display: none;
+    position: absolute;
+    content: "";
+    width: 5px;
+    height: 10px;
+    top: 3px;
+    left: 8px;
+    border: solid #F29400;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.c-checkbox label {
+    font-size: 18px;
+    line-height: 2.6rem;
+    margin-left: 10px;
+}
+
+/* STAR RATING */
+.star-rating {
+    font-family: 'FontAwesome';
+}
+.star-rating > fieldset {
+    border: none;
+    display: inline-block;
+}
+.star-rating > fieldset:not(:checked) > input {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+}
+.star-rating > fieldset:not(:checked) > label {
+    float: right;
+    width: 1em;
+    padding: 0.05em;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 50px;
+    color: #F29400;
+}
+.star-rating > fieldset:not(:checked) > label:before {
+    content: '\f006  ';
+}
+.star-rating > fieldset:not(:checked) > label:hover,
+.star-rating > fieldset:not(:checked) > label:hover ~ label {
+    color: #F29400;
+    text-shadow: 0 0 3px #F29400;
+}
+.star-rating > fieldset:not(:checked) > label:hover:before,
+.star-rating > fieldset:not(:checked) > label:hover ~ label:before {
+    content: '\f005  ';
+}
+.star-rating > fieldset > input:checked ~ label:before {
+    content: '\f005  ';
+}
+.star-rating > fieldset > label:active {
+    position: relative;
+}
+
+.question-title {
+    margin-top: 2rem;
+    margin-bottom: .5rem;
+    font-weight: 600;
+    font-size: 20px;
+    color: #333;
+}
+
+.question-required {
+    color: #F29400;
+}
+
+.documents-search-description {
+    font-size: 20px; 
+    margin-bottom: 10px;
+}
+
+.documents-search-background {
+    z-index: 999;
+}
+
+.news-container-title-span {
+    font-size: 27px; 
+    color: #F29400;
+}

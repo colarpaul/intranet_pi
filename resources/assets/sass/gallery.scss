@@ -1,0 +1,178 @@
+.wallpaper-home {
+/* The image used */
+background-image: url("/images/wallpaper-home.jpg");
+
+/* Set a specific height */
+min-height: 440px; 
+
+/* Create the parallax scrolling effect */
+background-position: center;
+background-repeat: no-repeat;
+background-size: cover;
+}
+
+.home-search-background {
+position: absolute;
+background: rgba(255, 255, 255, 0.78);
+height: 200px;
+width: 41%;
+top: 4rem;
+border-radius: 0 0 20px 0;
+padding: 1rem 3rem;
+}
+
+.home-search-title {
+font-size: 32px;
+margin-bottom: 1.5rem;
+}
+
+.gallery-container {
+margin-top: 3rem
+}
+
+.gallery-title-start {
+	font-size: 21px;
+}
+
+.gallery-title-date {
+	font-size: 17px;
+}
+
+.gallery-container img {
+}
+
+.wallpaper-gallery {
+background: url(/documents/news/header_bildergalerien_new.jpg);
+min-height: 440px;
+background-position: right;
+background-repeat: no-repeat;
+background-size: cover;
+}
+
+.gallery-search-background {
+position: absolute;
+background: rgba(255, 255, 255, 0.78);
+height: 175px;
+width: 36%;
+top: 4rem;
+border-radius: 0 0 20px 0;
+}
+
+.gallery-search-title {
+font-size: 32px;
+margin-bottom: 1.5rem;
+}
+
+.searchbar-employees-hidden {
+	position: relative; 
+	width: 100% !important;
+}
+
+.documents-search-description {
+	font-size: 20px; 
+	margin-bottom: 10px;
+}
+
+.width-100 {
+	width: 100%;
+}
+
+.downloadVCard {
+	position: absolute; 
+	right: 3rem; 
+	top: 3rem;
+}
+
+.employeeThumbnailphoto {
+	width: 150px; 
+	height: 150px; 
+	background-size: cover !important; 
+	border-radius:50%; 
+	margin: auto; 
+	text-align: center; 
+	margin-bottom: 20px;
+}
+
+.objects-search-title {
+	margin-bottom: 0;
+}
+
+.employee-div-header1 {
+	margin-bottom: 2rem; 
+	margin-top: 3rem; 
+	font-size: 27px; 
+	color: #F29400
+}
+
+.footer {
+	margin-top: 3rem;
+}
+
+.more-info-button a{
+	background-color: transparent;
+}
+
+.home-cloud-subtitle {
+	margin-top: 1rem;
+}
+
+.home-cloud-subtitle .fa-wifi {
+	margin-right: 1rem;
+}
+
+.wallpaper-home-objects {
+	background-image: url(/images/bg_cloud.jpg); 
+	background-position: right;
+}
+
+.empty-top-container {
+	height: 150px; 
+	background: white;
+}
+
+.is-flex {
+	display: flex !important;
+}
+
+.margin-right-20 {
+	margin-right: 20px;
+}
+
+.documents-pdf-image {
+	min-width: 38px !important; 
+	max-width: 41px !important;
+}
+
+.wallpaper-home-objects {
+	background-image: url(/images/bg_dokumente.jpg); 
+	background-position: right; 
+	background-repeat: no-repeat; 
+	background-size: cover;
+}
+
+.home-objects-container {
+	padding-right: 2rem;
+}
+
+.link-web {
+	margin-top: 6px
+}
+
+.padding-0 {
+	padding: 0;
+}
+
+.news-image-wrap {
+	background: url('{{ $lastNew->bild_teaser }}'); 
+	width:100%; 
+	min-height: 160px
+}
+
+.thumbnalphoto-employee {
+	height: 80px; 
+	border-radius:50%; 
+	margin: auto; 
+	text-align: center; 
+	margin-bottom: 20px; 
+	padding: 0;
+}
