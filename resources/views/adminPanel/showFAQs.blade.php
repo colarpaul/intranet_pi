@@ -71,7 +71,7 @@
 		<div class="col col-add-form">
 			<div class="col-add-form-title">Dokument hinzufügen</div>
 			<div>
-				<form method="POST" action="{{ action('ServiceController@addFAQs') }}" enctype="multipart/form-data" class="form-add-document" style="margin-top: 20px;">
+				<form method="POST" action="{{ action('DocumentsController@addFAQs') }}" enctype="multipart/form-data" class="form-add-document" style="margin-top: 20px;">
 					<table style="width: 100%;">
 						<tr>
 							<td class="add-description">
@@ -117,7 +117,7 @@
 </div>
 
 <div class="modal-container modal-news-container" style="display: none">
-	<form method="POST" action="{{ action('ServiceController@updateFAQs') }}" enctype="multipart/form-data" class="form-add-document" id="updateNewsForm" style="margin-top: 20px;">
+	<form method="POST" action="{{ action('DocumentsController@updateFAQs') }}" enctype="multipart/form-data" class="form-add-document" id="updateNewsForm" style="margin-top: 20px;">
 		<div class="row">
 			<div class="col col-md-12" >
 				<div class="divTable">

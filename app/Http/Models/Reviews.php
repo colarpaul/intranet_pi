@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 
 class Reviews extends Model
 {
-	public function addReview($data) 
+	public static function addReview($data) 
 	{
 		$reviews = DB::table('reviews')->where('who', $data['who'])->get();
 
@@ -28,7 +28,7 @@ class Reviews extends Model
 		return back();
 	}
 
-	public function hasReviewed($cookieId)
+	public static function hasReviewed($cookieId)
 	{
 		$reviews = DB::table('reviews')->where('who', $cookieId)->get();
 

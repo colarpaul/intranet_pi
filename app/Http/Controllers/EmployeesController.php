@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\Employees;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
-use Palmabit\ContactCsv\modules\ContactCsv;
+
+use App\Http\Helpers\Helper as Helper;
+use App\Http\Models\Employees as Employees;
 
 class EmployeesController extends Controller 
 {
@@ -16,369 +17,277 @@ class EmployeesController extends Controller
     */
     public function __construct()
     {
-    // $this->middleware('auth');
-
+        // $this->middleware('auth');
     }
+    
     /**
-    * Show the application dashboard.
-    * 
-    * @return \Illuminate\Http\Response
-    */
+     * Method: index()
+     *
+     * Rendering the EMPLOYEES page with all employees from database 
+     * page: /mitarbeiter
+     * 
+     * - employees         = all employees with image
+     * - employeesLocation = location from all employees 
+     * - employeesPosition = position from all employees 
+     */
     public function index(Request $request)
     {   
-        $employeesLocation = array();
-        $employeesPosition = array();
-        // $employeesOfMonth = array();
-        $employeesWithImage = array();
+        $employees                        = Employees::getEmployeesWithImage();
+        $employeesLocationsAndDepartments = Employees::getEmployeesLocationsAndDepatments();
 
-        $employeesModel = new Employees();
-
-        $allEmployees = $employeesModel->getEmployees();
-        $employees = $employeesModel->getEmployeesWithImage();
-
-        foreach($employees as $key => $employee){
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $employeesWithImage[$key]['cn'] = $employee->cn[0];
-                $employeesWithImage[$key]['company'] = $employee->company[0];
-                $employeesWithImage[$key]['l'] = $employee->l[0];
-                $employeesWithImage[$key]['department'] = $employee->department[0];
-                $employeesWithImage[$key]['streetaddress'] = $employee->streetaddress[0];
-                $employeesWithImage[$key]['postalcode'] = $employee->postalcode[0];
-                $employeesWithImage[$key]['mail'] = $employee->mail[0];
-                $employeesWithImage[$key]['title'] = $employee->title[0];
-                $employeesWithImage[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-                $employeesWithImage[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-                // $employeesWithImage[$key]['whencreated'] = substr($employee->whencreated[0], 0, 4).'-'.substr($employee->whencreated[0], 4, 2).'-'.substr($employee->whencreated[0], 6, 2);
-                $employeesWithImage[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
-        }
-
-        foreach($allEmployees as $employee){
-            if($employee->title[0] != ''){
+        $employeesLocation = [];
+        $employeesPosition = [];
+        foreach($employeesLocationsAndDepartments as $employee){
+            if(!in_array($employee->l[0], $employeesLocation)){
                 array_push($employeesLocation, $employee->l[0]);
-                if($employee->department != ''){
-                    array_push($employeesPosition, $employee->department[0]);
-                }
+            }
+            if(!in_array($employee->department[0], $employeesPosition)){
+                array_push($employeesPosition, $employee->department[0]);
             }
         }
-
-        $employeesLocation = array_unique($employeesLocation);
-        $employeesPosition = array_unique($employeesPosition);
         
         sort($employeesLocation);
         sort($employeesPosition);
 
-        $data = array(
-            'employees' => $employeesWithImage,
+        $data = [
+            'employees'         => $employees,
             'employeesLocation' => $employeesLocation,
             'employeesPosition' => $employeesPosition,
-        );
+        ];
 
         return view('employees', $data);
     }
 
+    /**
+     * Method: getEmployeesByName()
+     *
+     * Returning all EMPLOYEES by a given NAME
+     * page: /employees/getEmployeesByName
+     */
     public function getEmployeesByName(Request $request) 
     {
-        $employeesModel = new Employees();
+        $employees      = Employees::getEmployeesByName($request->input('name'));
 
-        $name = $request->input('name');
-
-        $employees = $employeesModel->getEmployeesByName($name);
-
-        $newArrayEmployees = array();
+        $newArrayEmployees = [];
         foreach($employees as $key => $employee){
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $newArrayEmployees[$key]['cn'] = $employee->cn[0];
-                $newArrayEmployees[$key]['mail'] = $employee->mail[0];
-                $newArrayEmployees[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-                $newArrayEmployees[$key]['title'] = $employee->title[0];
-                $newArrayEmployees[$key]['company'] = $employee->company[0];
-                $newArrayEmployees[$key]['l'] = $employee->l[0];
-                // $newArrayEmployees[$key]['whencreated'] = $employee->whencreated[0];
-                $newArrayEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-                $newArrayEmployees[$key]['postalcode'] = $employee->postalcode[0];
-                $newArrayEmployees[$key]['department'] = $employee->department[0];
-                $newArrayEmployees[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-                $newArrayEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
-        } 
+            $newArrayEmployees[$key] = $this->generateEmployeeData($employee);
+        }
 
         sort($newArrayEmployees);
 
         return $newArrayEmployees;
     }
 
+    /**
+     * Method: getEmployeeByEmail()
+     *
+     * Returning all EMPLOYEES by a given EMAIL
+     * page: /employees/getEmployeeByEmail
+     */
     public function getEmployeeByEmail(Request $request) 
     {
-        $employeesModel = new Employees();
+        $employee       = Employees::getEmployeeByEmail($request->input('email'));
+        $employee       = $this->generateEmployeeData($employee); 
 
-        $email = $request->input('email');
-
-        $employee = $employeesModel->getEmployeeByEmail($email);
-
-        $newArrayEmployees = array();
-        $newArrayEmployees['cn'] = $employee->cn[0];
-        $newArrayEmployees['mail'] = $employee->mail[0];
-        $newArrayEmployees['telephonenumber'] = $employee->telephonenumber[0];
-        $newArrayEmployees['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-        $newArrayEmployees['title'] = $employee->title[0];
-        $newArrayEmployees['company'] = $employee->company[0];
-        $newArrayEmployees['l'] = $employee->l[0];
-        // $newArrayEmployees['whencreated'] = $employee->whencreated[0];
-        $newArrayEmployees['streetaddress'] = $employee->streetaddress[0];
-        $newArrayEmployees['postalcode'] = $employee->postalcode[0];
-        $newArrayEmployees['department'] = $employee->department[0];
-        $newArrayEmployees['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-        $newArrayEmployees['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-
-        return $newArrayEmployees;
+        return $employee;
     }
 
+    /**
+     * Method: getEmployeeByName()
+     *
+     * Returning an EMPLOYEE by a given NAME
+     * page: /employees/getEmployeeByName
+     */
     public function getEmployeeByName(Request $request) 
     {
-        $employeesModel = new Employees();
+        $employees      = Employees::getEmployeeByName($request->input('name'));
 
-        $name = $request->input('name');
-
-        $employees = $employeesModel->getEmployeeByName($name);
-
-        $newArrayEmployees = array();
+        $newArrayEmployees = [];
         foreach($employees as $key => $employee){
-            $newArrayEmployees[$key]['cn'] = $employee->cn[0];
-            $newArrayEmployees[$key]['mail'] = $employee->mail[0];
-            $newArrayEmployees[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-            $newArrayEmployees[$key]['title'] = $employee->title[0];
-            $newArrayEmployees[$key]['company'] = $employee->company[0];
-            $newArrayEmployees[$key]['l'] = $employee->l[0];
-            // $newArrayEmployees[$key]['whencreated'] = $employee->whencreated[0];
-            $newArrayEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-            $newArrayEmployees[$key]['postalcode'] = $employee->postalcode[0];
-            $newArrayEmployees[$key]['department'] = $employee->department[0];
-            $newArrayEmployees[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-            $newArrayEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-        } 
+            $newArrayEmployees[$key] = $this->generateEmployeeData($employee);
+        }
 
         return $newArrayEmployees;
     }
 
+    /**
+     * Method: getAllEmployees()
+     *
+     * Returning all EMPLOYEES
+     * page: /employees/getAllEmployees
+     */
     public function getAllEmployees() 
     {
-        $employeesModel = new Employees();
+        $employees      = Employees::getEmployees();
 
-        $employees = $employeesModel->getEmployees();
-
-        $newArrayEmployees = array();
         foreach($employees as $key => $employee){
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $newArrayEmployees[$key]['cn'] = $employee->cn[0];
-                $newArrayEmployees[$key]['mail'] = $employee->mail[0];
-                $newArrayEmployees[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-                $newArrayEmployees[$key]['title'] = $employee->title[0];
-                $newArrayEmployees[$key]['company'] = $employee->company[0];
-                $newArrayEmployees[$key]['l'] = $employee->l[0];
-                // $newArrayEmployees[$key]['whencreated'] = $employee->whencreated[0];
-                $newArrayEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-                $newArrayEmployees[$key]['postalcode'] = $employee->postalcode[0];
-                $newArrayEmployees[$key]['department'] = $employee->department[0];
-                $newArrayEmployees[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-                $newArrayEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
+            $newArrayEmployees[$key] = $this->generateEmployeeData($employee);
         }
 
-        // $employees = array_values(array_values((array)$employees)[0]);
-        // sort($employees);
         sort($newArrayEmployees);
 
         return $newArrayEmployees;
     }
 
+    /**
+     * Method: getEmployeesByLocation()
+     *
+     * Returning all EMPLOYEES by a given LOCATION 
+     * page: /employees/getEmployeesByLocation
+     */
     public function getEmployeesByLocation(Request $request) 
     {
-        $employeesModel = new Employees();
+        $employees      = Employees::getEmployeesByLocation($request->input('location'));
 
-        $location = $request->input('location');
-
-        $employees = $employeesModel->getEmployeesByLocation($location);
-
-        $newArrayEmployees = array();
         foreach($employees as $key => $employee){
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $newArrayEmployees[$key]['cn'] = $employee->cn[0];
-                $newArrayEmployees[$key]['mail'] = $employee->mail[0];
-                $newArrayEmployees[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-                $newArrayEmployees[$key]['title'] = $employee->title[0];
-                $newArrayEmployees[$key]['company'] = $employee->company[0];
-                $newArrayEmployees[$key]['l'] = $employee->l[0];
-                // $newArrayEmployees[$key]['whencreated'] = $employee->whencreated[0];
-                $newArrayEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-                $newArrayEmployees[$key]['postalcode'] = $employee->postalcode[0];
-                $newArrayEmployees[$key]['department'] = $employee->department[0];
-                $newArrayEmployees[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-                $newArrayEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
+            $newArrayEmployees[$key] = $this->generateEmployeeData($employee);
         }
 
-        // $employees = array_values(array_values((array)$employees)[0]);
-        // sort($employees);
         sort($newArrayEmployees);
 
         return $newArrayEmployees;
     }
 
+    /**
+     * Method: getEmployeesByPosition()
+     *
+     * Returning all EMPLOYEES by a given POSITION 
+     * page: /employees/getEmployeesByPosition
+     */
     public function getEmployeesByPosition(Request $request) 
     {
-        $employeesModel = new Employees();
-
         $position = $request->input('position');
 
-        $employees = $employeesModel->getEmployeesByPosition($position);
+        $employees      = Employees::getEmployeesByPosition($position);
 
-        $newArrayEmployees = array();
+        $newArrayEmployees = [];
         foreach($employees as $key => $employee){
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $newArrayEmployees[$key]['cn'] = $employee->cn[0];
-                $newArrayEmployees[$key]['mail'] = $employee->mail[0];
-                $newArrayEmployees[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-                $newArrayEmployees[$key]['title'] = $employee->title[0];
-                $newArrayEmployees[$key]['company'] = $employee->company[0];
-                $newArrayEmployees[$key]['l'] = $employee->l[0];
-                // $newArrayEmployees[$key]['whencreated'] = $employee->whencreated[0];
-                $newArrayEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-                $newArrayEmployees[$key]['postalcode'] = $employee->postalcode[0];
-                $newArrayEmployees[$key]['department'] = $employee->department[0];
-                $newArrayEmployees[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-                $newArrayEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
+            $newArrayEmployees[$key] = $this->generateEmployeeData($employee);
         }
 
-        $newArrayEmployeesSortedByLocation = array();
+        $newArrayEmployeesSortedByLocation = [];
         foreach($newArrayEmployees as $key => $value){
             $newArrayEmployeesSortedByLocation[$value['l']][$value['cn']] = $value;
         }
-
 
         ksort($newArrayEmployeesSortedByLocation);
 
         return $newArrayEmployeesSortedByLocation;
     }
 
+    /**
+     * Method: getEmployeesByLocationAndPosition()
+     *
+     * Returning all EMPLOYEES by a given LOCATION and POSITION 
+     * page: /employees/getEmployeesByLocationAndPosition
+     */
     public function getEmployeesByLocationAndPosition(Request $request) 
     {
-        $employeesModel = new Employees();
-
         $location = $request->input('location');
         $position = $request->input('position');
 
-        $employees = $employeesModel->getEmployeesByLocationAndPosition($location, $position);
+        $employees      = Employees::getEmployeesByLocationAndPosition($location, $position);
 
-        $newArrayEmployees = array();
+        $newArrayEmployees = [];
         foreach($employees as $key => $employee){
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $newArrayEmployees[$key]['cn'] = $employee->cn[0];
-                $newArrayEmployees[$key]['mail'] = $employee->mail[0];
-                $newArrayEmployees[$key]['telephonenumber'] = $this->formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]);
-                $newArrayEmployees[$key]['title'] = $employee->title[0];
-                $newArrayEmployees[$key]['company'] = $employee->company[0];
-                $newArrayEmployees[$key]['l'] = $employee->l[0];
-                // $newArrayEmployees[$key]['whencreated'] = $employee->whencreated[0];
-                $newArrayEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-                $newArrayEmployees[$key]['postalcode'] = $employee->postalcode[0];
-                $newArrayEmployees[$key]['department'] = $employee->department[0];
-                $newArrayEmployees[$key]['mobile'] = $this->formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]);
-                $newArrayEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
+            $newArrayEmployees[$key] = $this->generateEmployeeData($employee);
         }
 
-        $newArrayEmployeesSortedByLocation = array();
+        $newArrayEmployeesSortedByLocation = [];
         foreach($newArrayEmployees as $key => $value){
             $newArrayEmployeesSortedByLocation[$value['l']][$value['cn']] = $value;
         }
 
         ksort($newArrayEmployeesSortedByLocation);
 
-        // $employees = array_values(array_values((array)$employees)[0]);
-        // sort($employees);
-        // sort($newArrayEmployees);
-
         return $newArrayEmployeesSortedByLocation;
     }
 
-    public function getCentralEmployeesByPosition(Request $request){
-        $employeesModel = new Employees();
-
+    /**
+     * Method: getCentralEmployeesByPosition()
+     *
+     * Returning all CENTRAL EMPLOYEES by a given POSITION 
+     * page: /employees/getCentralEmployeesByPosition
+     */
+    public function getCentralEmployeesByPosition(Request $request)
+    {
         $position = $request->input('position');
 
-        return $employeesModel->getCentralEmployeesByPosition($position);
+        return Employees::getCentralEmployeesByPosition($position);
     }
 
-    public function getCentralEmployeesByLocationAndPosition(Request $request){
-        $employeesModel = new Employees();
-
+    /**
+     * Method: getCentralEmployeesByLocationAndPosition()
+     *
+     * Returning all CENTRAL EMPLOYEES by a given LOCATION and POSITION 
+     * page: /employees/getCentralEmployeesByLocationAndPosition
+     */
+    public function getCentralEmployeesByLocationAndPosition(Request $request)
+    {
         $location = $request->input('location');
         $position = $request->input('position');
 
-        return $employeesModel->getCentralEmployeesByLocationAndPosition($location, $position);
+        return Employees::getCentralEmployeesByLocationAndPosition($location, $position);
     }
-    
+
+    /**
+     * Method: addCentral()
+     *
+     * Adding a CENTRAL
+     * page: /employees/addCentral
+     */
     public function addCentral(Request $request) 
     {
-        $employeesModel = new Employees();
-
-        $data = array(
-            'zentrale' => $request->input('centralZentrale'),
-            'strasse' => $request->input('centralStrasse'),
-            'telefon' => $request->input('centralTelefon'),
-            'abteilung' => $request->input('centralAbteilung'),
-            'standort' => str_replace(' ', '', $request->input('centralStandort')),
+        $data = [
+            'zentrale'    => $request->input('centralZentrale'),
+            'strasse'     => $request->input('centralStrasse'),
+            'telefon'     => $request->input('centralTelefon'),
+            'abteilung'   => $request->input('centralAbteilung'),
+            'standort'    => str_replace(' ', '', $request->input('centralStandort')),
             'sekretariat' => $request->input('centralSekretariat'),
-        );
+        ];
 
-        $employeesModel->addCentral($data);  
+        Employees::addCentral($data);  
 
         return back();
     } 
 
+    /**
+     * Method: removeCentralById()
+     *
+     * Remove a CENTRAL by a given CENTRAL ID
+     * page: /employees/removeCentralById
+     */
     public function removeCentralById(Request $request) 
     {
-        $employeesModel = new Employees();
-
-        $data = array(
-            'id' => $request->get('id'),
-        );
-
-        $employeesModel->removeCentralById($data);  
+        Employees::removeCentralById($request->get('id'));  
 
         return true;
     }   
 
+    /**
+     * Method: getCentralInfo()
+     *
+     * Returning a CENTRAL by a given CENTRAL ID
+     * page: /employees/getCentralInfo
+     */
     public function getCentralInfo(Request $request)
     {
-        $employeesModel = new Employees();
-
-        $centralId = $request->input('centralId');
-
-        $central = $employeesModel->showCentral($centralId);
+        $central        = Employees::showCentral($request->input('centralId'));
 
         return json_encode($central);
     }
 
+    /**
+     * Method: updateCentral()
+     *
+     * Update a CENTRAL by given CENTRAL DATA
+     * page: /employees/updateCentral
+     */
     public function updateCentral(Request $request)
     {
-        $employeesModel = new Employees();
 
-        $data = array(
+        $data = [
             "id" => $request->input('centralId'),
             "zentrale" => $request->input('centralZentrale'),
             "strasse" => $request->input('centralStrasse'),
@@ -386,177 +295,117 @@ class EmployeesController extends Controller
             "abteilung" => $request->input('centralAbteilung'),
             'standort' => str_replace(' ', '', $request->input('centralStandort')),
             "sekretariat" => $request->input('centralSekretariat'),
-        );
+        ];
 
-        $employeesModel->updateCentral($data);
+        Employees::updateCentral($data);
 
         return back();
     }
 
-    static function formatPhoneNumberByLocationAndStreet($phoneNumber, $location, $street) {
-     switch($location){
-        case 'Nürnberg':
-        if(strlen($phoneNumber) == 12){
-            if (strpos($street, 'Bucher Straße 79a') !== false){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 3) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 3) . ' ' . substr($phoneNumber, 11, 1);
-            } else {
-                // doesn't exists
-            }
-        } elseif(strlen($phoneNumber) == 13){
-            if (strpos($street, 'Bucher Straße 79a') !== false){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 3) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 3) . ' ' . substr($phoneNumber, 11, 2);
-            } else {
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 3) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 1);
-            }
-        } elseif(strlen($phoneNumber) == 14) {
-            if (strpos($street, 'Bucher Straße 79a') !== false){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 3) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 3) . ' ' . substr($phoneNumber, 11, 3);
-            } else {
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 3) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 2);
-            }
-        } elseif(strlen($phoneNumber) == 15) {
-            if (strpos($street, 'Bucher Straße 79a') !== false){
-                // doesn't exists
-            } else {
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 3) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 3);
-            }
-        }
-        break;
-        case 'Berlin':
-        if(strlen($phoneNumber) == 12){
-            if (strpos($street, 'Volmerstraße 10') !== false){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 2) . ' ' . substr($phoneNumber, 11, 1);
-            } else {
-                // doesn't exists
-            }
-        } elseif(strlen($phoneNumber) == 13){
-            if (strpos($street, 'Volmerstraße 10') !== false){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 2) . ' ' . substr($phoneNumber, 11, 2);
-            } else {
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1);
-            }
-        } elseif(strlen($phoneNumber) == 14) {
-            if (strpos($street, 'Volmerstraße 10') !== false){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 2) . ' ' . substr($phoneNumber, 11, 3);
-            } else {
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 1);
-            }
-        } elseif(strlen($phoneNumber) == 15) {
-            if (strpos($street, 'Volmerstraße 10') !== false){
-                // doesn't exists
-            } else {
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 2);
-            }
-        }
-        break;
-        case 'München':
-        if(strlen($phoneNumber) == 13){
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 3) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 1);
-        } elseif(strlen($phoneNumber) == 14) {
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 3) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 1);
-        }
-        break;
-        case 'Hamburg':
-        if(strlen($phoneNumber) == 13){
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1);
-        } elseif(strlen($phoneNumber) == 14) {
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 1);
-        } elseif(strlen($phoneNumber) == 15) {
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 2) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 2);
-        }
-        break;
-        case 'Frankfurt am Main':
-        if(substr($phoneNumber, 3, 2) == 69){
-            if(strlen($phoneNumber) == 13){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 3) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 1);
-            } elseif(strlen($phoneNumber) == 14){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 2) . '.' . substr($phoneNumber, 5, 3) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 2) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 1);
-            }
-        } elseif(substr($phoneNumber, 3, 4) == 6122) {
-            if(strlen($phoneNumber) == 13){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 4) . '.' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1);
-            } elseif(strlen($phoneNumber) == 14){
-                $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 4) . '.' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 3) . ' ' . substr($phoneNumber, 12, 1) . substr($phoneNumber, 13, 1);
-            }
-        }
-        break;
-        case 'Düsseldorf':
-        if(strlen($phoneNumber) == 12){
-            $phoneNumber = substr($phoneNumber, 0, 4) . '.' . substr($phoneNumber, 4, 2) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 1);
-        } elseif(strlen($phoneNumber) == 13){
-            $phoneNumber = substr($phoneNumber, 0, 4) . '.' . substr($phoneNumber, 4, 2) . '.' . substr($phoneNumber, 6, 2) . ' ' . substr($phoneNumber, 8, 2) . ' ' . substr($phoneNumber, 10, 1) . substr($phoneNumber, 11, 1);
-        }
-        break;
-        case 'Wien':
-        if(strlen($phoneNumber) == 12){
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 1) . '.' . substr($phoneNumber, 4, 3) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 2) . ' ' . substr($phoneNumber, 11, 1);
-        } elseif(strlen($phoneNumber) == 13){
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 1) . '.' . substr($phoneNumber, 4, 3) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 2) . ' ' . substr($phoneNumber, 11, 1) . substr($phoneNumber, 12, 1);
-        } elseif(strlen($phoneNumber) == 14){
-            $phoneNumber = substr($phoneNumber, 0, 3) . ' ' . substr($phoneNumber, 3, 1) . '.' . substr($phoneNumber, 4, 3) . ' ' . substr($phoneNumber, 7, 2) . ' ' . substr($phoneNumber, 9, 2) . ' ' . substr($phoneNumber, 11, 1) . substr($phoneNumber, 12, 2);
-        }
-        break;
-        default:
-        $phoneNumber = $phoneNumber;
-        break;
+    /**
+     * Method: generateEmployeeData()
+     *
+     * Create EMPLOYEES DATA in the needed format
+     */
+    public function generateEmployeeData($employee)
+    {
+        $data = [
+            'cn' => $employee->cn[0],
+            'company' => $employee->company[0],
+            'l' => $employee->l[0],
+            'department' => $employee->department[0],
+            'streetaddress' => $employee->streetaddress[0],
+            'postalcode' => $employee->postalcode[0],
+            'mail' => $employee->mail[0],
+            'title' => $employee->title[0],
+            'telephonenumber' => Helper::formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]),
+            'mobile' => Helper::formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]),
+            // whencreated'] = substr($employee->whencreated[0], 0, 4).'-'.substr($employee->whencreated[0], 4, 2).'-'.substr($employee->whencreated[0], 6, 2),
+            'thumbnailphoto' => base64_encode($employee->thumbnailphoto[0]),
+        ];
+
+        return $data;
     }
 
-    return $phoneNumber;
-}
+    /**
+     * Method: downloadVCard()
+     *
+     * Format an outlook card to be after downloaded
+     * (for a specific email(employee))
+     */
+    public function downloadVCard($email)
+    {
+        $employee = Employees::getEmployeeByEmail($email);
 
-static function formatMobileNumberByLocation($mobileNumber, $location)
-{
-    switch($location){
-        case 'Wien':
-        $mobileNumber = substr($mobileNumber, 0, 3) . ' ' . substr($mobileNumber, 3, 3) . '.' . substr($mobileNumber, 6, 2) . ' ' . substr($mobileNumber, 8, 2) . ' ' . substr($mobileNumber, 10, 2) . ' ' . substr($mobileNumber, 12, 2);
-        break;
-        default:
-        $mobileNumber = substr($mobileNumber, 0, 3) . ' ' . substr($mobileNumber, 3, 3) . '.' . substr($mobileNumber, 6, 2) . ' ' . substr($mobileNumber, 8, 2) . ' ' . substr($mobileNumber, 10, 2) . ' ' . substr($mobileNumber, 12, 2);
-        break;
-        return;
+        $name = explode(', ', $employee->cn[0]);
+
+        $firstName = $name[0];
+        $lastName = $name[1];
+
+        header('Content-Type: text/vcf; charset=utf-8');  
+        header('Content-Disposition: attachment; filename=' . $name[1] . '_' . $name[0] . '.vcf');  
+        $output = fopen("php://output", "w");  
+        fwrite($output, 'BEGIN:VCARD');
+        fwrite($output, "\n");
+        fwrite($output, 'N:'.$firstName.';'.$lastName.'');
+        fwrite($output, "\n");
+        fwrite($output, 'FN:'.$employee->cn[0].'');
+        fwrite($output, "\n");
+        fwrite($output, 'ORG:'.$employee->company[0].'');
+        fwrite($output, "\n");
+        fwrite($output, 'TITLE;CHARSET=utf-8:'.$employee->title[0].'');
+        fwrite($output, "\n");
+        fwrite($output, 'TEL;WORK;VOICE:'.$employee->telephonenumber[0].'');
+        fwrite($output, "\n");
+        fwrite($output, 'TEL;CELL;VOICE:'.$employee->mobile[0].'');
+        fwrite($output, "\n");
+        fwrite($output, 'EMAIL;PREF;INTERNET:'.$email.'');
+        fwrite($output, "\n");
+        fwrite($output, 'ADR;WORK;PREF;CHARSET=utf-8:;;;'.$employee->streetaddress[0]. ', ' . $employee->l[0] .';;;');
+        fwrite($output, "\n");
+        fwrite($output, 'END:VCARD');
+        fclose($output);  
     }
 
-    if(trim($mobileNumber) == '.'){
-        $mobileNumber = '';
+    /**
+     * Method: employeesStefan()
+     *
+     * Returning all Employees (Method created for <<Stefan Reihl>>)
+     * page: /employees/employeesStefan
+     */
+    public function employeesStefan(Request $request)
+    {
+        $employees = Employees::getEmployeesStefan();
+
+        foreach($employees as $employee){
+            print_r($employee->cn[0].', '.$employee->department[0].', '.$employee->title[0].', '.$employee->streetaddress[0].', '.$employee->l[0]);
+            echo '<br>';
+        }
+
+        echo '<hr>';
+        print_r('TOTAL: '.count($employees));
+
+        die();
     }
 
-    return $mobileNumber;
-}
+    /**
+     * Method: employeesStefanIMG()
+     *
+     * Returning all Employees with IMAGE (Method created for <<Stefan Reihl>>)
+     * page: /employees/employeesStefanIMG
+     */
+    public function employeesStefanIMG(Request $request)
+    {
+        $employees = Employees::getEmployeesStefanIMG();
 
-function downloadVCard($email){
+        foreach($employees as $employee){
+            print_r($employee->cn[0].', '.$employee->department[0].', '.$employee->title[0].', '.$employee->streetaddress[0].', '.$employee->l[0]);
+            echo '<br>';
+        }
 
-    $employeeModel = new Employees;
-    $employee = $employeeModel->getEmployeeByEmail($email);
+        echo '<hr>';
+        print_r('TOTAL: '.count($employees));
 
-    
-    $name = explode(', ', $employee->cn[0]);
-    //Colar
-    $firstName = $name[0];
-    //Paul
-    $lastName = $name[1];
-
-    header('Content-Type: text/vcf; charset=utf-8');  
-    header('Content-Disposition: attachment; filename=' . $name[1] . '_' . $name[0] . '.vcf');  
-    $output = fopen("php://output", "w");  
-    fwrite($output, 'BEGIN:VCARD');
-    fwrite($output, "\n");
-    fwrite($output, 'N:'.$firstName.';'.$lastName.'');
-    fwrite($output, "\n");
-    fwrite($output, 'FN:'.$employee->cn[0].'');
-    fwrite($output, "\n");
-    fwrite($output, 'ORG:'.$employee->company[0].'');
-    fwrite($output, "\n");
-    fwrite($output, 'TITLE:'.$employee->title[0].'');
-    fwrite($output, "\n");
-    fwrite($output, 'TEL;WORK;VOICE:'.$employee->telephonenumber[0].'');
-    fwrite($output, "\n");
-    fwrite($output, 'EMAIL;PREF;INTERNET:'.$email.'');
-    fwrite($output, "\n");
-    fwrite($output, 'ADR;WORK;PREF;CHARSET=utf-8:;;;'.$employee->streetaddress[0]. ', ' . $employee->l[0] .';;;');
-    fwrite($output, "\n");
-    fwrite($output, 'END:VCARD');
-    fclose($output);  
-}
-
-
+        die();
+    }
 }

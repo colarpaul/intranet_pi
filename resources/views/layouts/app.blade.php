@@ -12,6 +12,7 @@
   <title>PROJECT Immobilien · Intranet</title>
 
   <!-- Styles -->
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <link href="{{ asset('css/chosen/chosen.min.css') }}" rel="stylesheet">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="{{ asset('css/bulma.css') }}">
@@ -35,6 +36,7 @@
   </script>
   <!-- End Matomo Code -->
   @endif
+
 
 </head>
 <body>
@@ -83,8 +85,11 @@
           <div class="navbar-item @if(Route::current()->uri == 'mitarbeiter') navbar-is-active @endif">
             <a href="{{ url('mitarbeiter') }}">Mitarbeiter</a>
           </div>
-          <div class="navbar-item @if(Route::current()->uri == 'dokumente-support' OR Route::current()->uri == 'dokumente-support/alleDokumente') navbar-is-active @endif">
-            <a href="{{ url('dokumente-support') }}">Dokumente & Support</a>
+          <div class="navbar-item @if(Route::current()->uri == 'dokumente' OR Route::current()->uri == 'dokumente/alleDokumente') navbar-is-active @endif">
+            <a href="{{ url('dokumente') }}">Dokumente</a>
+          </div>
+          <div class="navbar-item @if(Route::current()->uri == 'faq-support') navbar-is-active @endif">
+            <a href="{{ url('faq-support') }}">FAQ & Support</a>
           </div>
           <div class="navbar-item @if(Route::current()->uri == 'bildergalerien' OR Route::current()->uri == 'bildergalerien/{location}') navbar-is-active @endif">
             <a href="{{ url('bildergalerien') }}">Bildergalerien</a>
@@ -95,7 +100,6 @@
         </div>
 
       </div>
-
 
     </nav>
 
@@ -117,11 +121,11 @@
 <script src="{{ asset('js/chosen/init.js')}}" type="text/javascript" charset="utf-8"></script>
 @yield('content.js')
 <script src="{{ asset('js/main.min.js') }}" type="text/javascript" charset="utf-8"></script>
-  <script>
-    $('.search-all').on('click', function(e){
-      e.preventDefault;
-      $('.searchAllForm').submit();
-    })
-  </script>
+<script>
+  $('.search-all').on('click', function(e){
+    e.preventDefault;
+    $('.searchAllForm').submit();
+  })
+</script>
 </body>
 </html>

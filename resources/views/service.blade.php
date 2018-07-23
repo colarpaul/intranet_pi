@@ -42,7 +42,6 @@
             <div class="category-option-span category-option-1 category-option-is-active" data-value="documents">Dokumente</div>
             <div class="category-option-span category-option-2" data-value="faq">FAQ</div>
             <div class="category-option-span category-option-3" data-value="support">Support</div>
-            <!-- <div class="category-option-span category-option-4" data-value="feedback">Feedback</div> -->
         </div>
     </div>
 </nav>
@@ -77,7 +76,7 @@
                         <a target="_blank" href="{{ $document->pfad }}">
                             <div class="divTableCell">
                                 <div>
-                                    <img class="documents-pdf-image" src="@if(strtotime($dokument->created_at) > strtotime('-30 days'))/images/{{substr($dokument->pfad, -3)}}_new.png @else /images/{{substr($dokument->pfad, -3)}}.png @endif" />
+                                    <img class="documents-pdf-image" src="@if(strtotime($document->created_at) > strtotime('-30 days'))/images/{{substr($document->pfad, -3)}}_new.png @else /images/{{substr($document->pfad, -3)}}.png @endif" />
                                 </div>
                                 <div class="documents-pdf-name">
                                     {{ $document->name }}

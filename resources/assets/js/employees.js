@@ -23,17 +23,18 @@ $(document).on('click','.employee-wraper',function(e){
 function appendEmployeeToModal(email){
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeeByEmail',
+		url: '/mitarbeiter/getEmployeeByEmail',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'email': email }
 	})
 	.done(function(employee){
+		console.log(employee);
 		var imageSRC = ((employee.thumbnailphoto) ? 'url("data:image/jpeg;base64, ' + employee.thumbnailphoto + '")' : 'url("/images/profile-image-example.png")');
 		var telephone = (employee.telephonenumber) ? employee.telephonenumber : '-';
 		var mobile = (employee.mobile) ? employee.mobile : '-';
 
-		$('.modal-container.employeeModal .downloadVCard').attr('href', '/employees/downloadVCard/'+employee.mail);
+		$('.modal-container.employeeModal .downloadVCard').attr('href', '/mitarbeiter/downloadVCard/'+employee.mail);
 		$('.modal-container.employeeModal .employeeThumbnailphoto').css('background-image', imageSRC);
 		$('.modal-container.employeeModal .employeeName').html(employee.cn);
 		$('.modal-container.employeeModal .employeeTitle').html(employee.title);
@@ -238,7 +239,7 @@ function getEmployeesByLocationAndPosition(location, position){
 
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeesByLocationAndPosition',
+		url: '/mitarbeiter/getEmployeesByLocationAndPosition',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'location': location, 'position': position.replace(/&amp;/g, '&') }
@@ -313,7 +314,7 @@ function getEmployeesByPosition(position){
 
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeesByPosition',
+		url: '/mitarbeiter/getEmployeesByPosition',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'position': position.replace(/&amp;/g, '&') }
@@ -398,7 +399,7 @@ function getEmployeesByLocation (location){
 
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeesByLocation',
+		url: '/mitarbeiter/getEmployeesByLocation',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'location': location }
@@ -449,7 +450,7 @@ function getEmployeeByName(name){
 
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeeByName',
+		url: '/mitarbeiter/getEmployeeByName',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'name': name }
@@ -514,7 +515,7 @@ function getEmployeesByName(name){
 
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeesByName',
+		url: '/mitarbeiter/getEmployeesByName',
 		dataType: 'json'
 		,		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'name': name }
@@ -572,7 +573,7 @@ function getAllEmployeesWithNameAndPopupList(name){
 
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getEmployeesByName',
+		url: '/mitarbeiter/getEmployeesByName',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'name': name }
@@ -604,7 +605,7 @@ function getCentralEmployeesByPosition(position){
 				console.log(position);
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getCentralEmployeesByPosition',
+		url: '/mitarbeiter/getCentralEmployeesByPosition',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'position': position }
@@ -635,7 +636,7 @@ function getCentralEmployeesByPosition(position){
 				$.each(employees, function(key, email){
 					$.ajax({
 						type: 'POST',
-						url: '/employees/getEmployeeByEmail',
+						url: '/mitarbeiter/getEmployeeByEmail',
 						dataType: 'json',
 						headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 						data: { 'email': email }
@@ -687,7 +688,7 @@ function hideEmployeeFromTableIfIsInCentral(replacedMail){
 function getCentralEmployeesByLocationAndPosition(location, position){
 	$.ajax({
 		type: 'POST',
-		url: '/employees/getCentralEmployeesByLocationAndPosition',
+		url: '/mitarbeiter/getCentralEmployeesByLocationAndPosition',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'location': location, 'position': position }
@@ -717,7 +718,7 @@ function getCentralEmployeesByLocationAndPosition(location, position){
 				$.each(employees, function(key, email){
 					$.ajax({
 						type: 'POST',
-						url: '/employees/getEmployeeByEmail',
+						url: '/mitarbeiter/getEmployeeByEmail',
 						dataType: 'json',
 						headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 						data: { 'email': email }

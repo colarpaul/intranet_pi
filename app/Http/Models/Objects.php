@@ -6,31 +6,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
+use App\Http\Helpers\Helper as Helper;
+
 class Objects extends Model
 {
-	public function getObjects()
+	public static function getObjects()
 	{
-		$objects = DB::table('objects')->orderBy('updated_at', 'desc')->paginate(15);
-
-		return $objects;
+		return DB::table('objects')->orderBy('updated_at', 'desc')->paginate(15);
 	}
 
-	public function getActiveObjects()
+	public static function getActiveObjects()
 	{
-		$objects = DB::table('objects')->where('status', 1)->orderBy('objekt', 'asc')->get();
-
-		return $objects;
+		return DB::table('objects')->where('status', 1)->orderBy('objekt', 'asc')->get();
 	}
 
 	// TODO: Find another name
-	public function getBranches()
+	public static function getBranches()
 	{
-		$niederlassungen = DB::table('objects')->select('niederlassung')->where('status', 1)->groupBy('niederlassung')->get();
-
-		return $niederlassungen;
+		return DB::table('objects')->select('niederlassung')->where('status', 1)->groupBy('niederlassung')->get();
 	}
 
-	public function getObjectsByKey($key){
+	public static function getObjectsByKey($key)
+	{
 		return DB::table('objects')
 		->where('name', 'like', '%'.$key.'%')
 		->orWhere('strasse', 'like', '%'.$key.'%')
@@ -39,10 +36,9 @@ class Objects extends Model
 		->orWhere('niederlassung', 'like', '%'.$key.'%')
 		->orWhere('objekt', 'like', '%'.$key.'%')
 		->get();
-
 	}
 
-	public function getCities($niederlassung)
+	public static function getCities($niederlassung)
 	{
 		$cities = DB::table('objects')
 		->select(DB::raw('GROUP_CONCAT(DISTINCT stadt) as cities, niederlassung'))
@@ -59,38 +55,24 @@ class Objects extends Model
 		return $cities;
 	}
 
-	public function getLastAddedObjects()
+	public static function getLastAddedObjects()
 	{
-		$objects = DB::table('objects')->where('status', 1)->orderBy('updated_at', 'desc')->take(6)->get();
-
-		return $objects;
+		return DB::table('objects')->where('status', 1)->orderBy('updated_at', 'desc')->take(6)->get();
 	}
 
-	public function getObjectsByBranch($branch)
+	public static function getObjectsByBranch($branch)
 	{
-		if($branch != ''){
-			$objects = DB::table('objects')->where('status', 1)->where('niederlassung', $branch)->orderBy('objekt', 'asc')->get();
-		} else {
-			$objects = DB::table('objects')->where('status', 1)->orderBy('objekt', 'asc')->get();
-		}
-
-		return $objects;
+		return DB::table('objects')->where('status', 1)->where('niederlassung', $branch)->orderBy('objekt', 'asc')->get();
 	}
 
-	public function getAllObjectsByCity($city)
+	public static function getAllObjectsByCity($city)
 	{
-		if($city != ''){
-			$objects = DB::table('objects')->where('status', 1)->where('stadt', $city)->orderBy('objekt', 'asc')->get();
-		} else {
-			$objects = DB::table('objects')->where('status', 1)->orderBy('objekt', 'asc')->get();
-		}
-
-		return $objects;
+		return DB::table('objects')->where('status', 1)->where('stadt', $city)->orderBy('objekt', 'asc')->get();
 	}
 
-	public function getAllObjectsWithName($name)
+	public static function getAllObjectsWithName($name)
 	{
-		$objects = DB::table('objects')
+		return DB::table('objects')
 		->where([
 			['status', '=', 1],
 			['name', 'like', '%'.$name.'%'],
@@ -112,29 +94,19 @@ class Objects extends Model
 			['objekt', 'like', '%'.$name.'%'],
 		])
 		->orderBy('objekt', 'asc')->get();
-
-		return $objects;
 	}
 
-	public function getObjectWithId($id)
+	public static function getObjectWithId($id)
 	{
-		$objects = DB::table('objects')->where('status', 1)->where('id', $id)->orderBy('objekt', 'asc')->get();
-
-		return $objects;
+		return DB::table('objects')->where('status', 1)->where('id', $id)->orderBy('objekt', 'asc')->get();
 	}
 
-	public function showObject($id)
+	public static function showObject($id)
 	{
 		return DB::table('objects')->where('id', $id)->get()->first();
 	}
 
-
-	/**
-	 * Update a object status
-	 * 
-	 * @return array
-	 */
-	public function updateObjectStatus($objectId, $objectStatus) 
+	public static function updateObjectStatus($objectId, $objectStatus) 
 	{
 		DB::table('objects')
 		->where('id', $objectId)
@@ -144,22 +116,17 @@ class Objects extends Model
 		);
 	}	
 
-
-	/**
-	 * Update a object status
-	 * 
-	 * @return array
-	 */
-	public function updateObject($data) 
+	public static function updateObject($data) 
 	{
 		if($data['pdf']){
 			$documentOriginalName = $data['pdf']->getClientOriginalName();
 			$pathParts = pathinfo($documentOriginalName);
 			$documentExtension = $pathParts['extension'];
-			$documentFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $data['name'].'.'.$documentExtension));
-			$documentPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/pdf/'.$documentFullName));
+			$documentFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $data['name'].'.'.$documentExtension));
+			$documentPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/pdf/'.$documentFullName));
 
 			Storage::disk('public_uploads')->putFileAs('', $data['pdf'], $documentFullName);
+
 
 			DB::table('objects')
 			->where('id', $data['id'])
@@ -182,28 +149,18 @@ class Objects extends Model
 		);
 	}	
 
-	/**
-	 * Add a subcategory
-	 * 
-	 * @return array
-	 */
-	public function removeObject($data) 
+	public static function removeObject($data) 
 	{
 		DB::table('objects')->where('id', $data['objectId'])->delete();
 	}
-
-	/**
-	 * Add a document
-	 * 
-	 * @return array
-	 */
-	public function addObject($data) 
+	
+	public static function addObject($data) 
 	{
 		$objectOriginalName = $data['objectFile']->getClientOriginalName();
 		$pathParts = pathinfo($objectOriginalName);
 		$objectExtension = $pathParts['extension'];
-		$objectFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $data['objectName'].'.'.$objectExtension));
-		$objectPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/objects/'.$objectFullName));
+		$objectFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $data['objectName'].'.'.$objectExtension));
+		$objectPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/objects/'.$objectFullName));
 
 		Storage::disk('public_objects_uploads')->putFileAs('', $data['objectFile'], $objectFullName);
 
@@ -221,18 +178,4 @@ class Objects extends Model
 			'datum' => $data['objectDatum'],
 		]);
 	}
-
-	// CREATE NEW FOLDER WITH HELPER FUNCTIONS !!!
-	function transformGermanChars($string)
-	{
-		$string = str_replace("ä", "ae", $string);
-		$string = str_replace("ü", "ue", $string);
-		$string = str_replace("ö", "oe", $string);
-		$string = str_replace("Ä", "Ae", $string);
-		$string = str_replace("Ü", "Ue", $string);
-		$string = str_replace("Ö", "Oe", $string);
-		$string = str_replace("ß", "ss", $string);
-		$string = str_replace("´", "", $string);
-		return $string;
-	}	
 }

@@ -2,35 +2,33 @@
 
 namespace App\Http\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+
 use Adldap\Laravel\Facades\Adldap;
 
 class Employees extends Model
 {
-	/**
-	 * Get all Employees
-	 * 
-	 * @return object
-	 */
-	public function getEmployees(){
-
+	public static function getEmployees()
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->whereHas('title')
 		->sortBy('cn', 'asc')
 		->get();	
 
 		return $employees;
 	}
 
-	public function getEmployeesByKey($key){
-
+	public static function getEmployeesByKey($key)
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->orWhere('cn', 'contains', $key)
 		->orWhere('givenname', 'contains', $key)
 		->orWhere('sn', 'contains', $key)
 		->orWhere('mail', 'contains', $key)
@@ -40,173 +38,151 @@ class Employees extends Model
 		->orWhere('title', 'contains', $key)
 		->orWhere('company', 'contains', $key)
 		->orWhere('l', 'contains', $key)
+		->whereHas('title')
 		->get();	
 
 		return $employees;
 	}
-	/**
-	 * Get all Employees
-	 * 
-	 * @return object
-	 */
-	public function getEmployeesWithImage(){
 
+	public static function getEmployeesWithImage()
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
 		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->whereHas('thumbnailphoto')
+		->whereHas('title')
 		->sortBy('cn', 'asc')
 		->get();	
 
 		return $employees;
 	}
-	/**
-	 * Get all Employees
-	 * 
-	 * @return object
-	 */
-	public function getHomeEmployees(){
 
+	public static function getEmployeesLocationsAndDepatments()
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('l', 'department')
+		->whereHas('title')
+		->get();
+
+		return $employees;
+	}
+
+	public static function getHomeEmployees()
+	{
+		$employees = Adldap::connect()
+		->search()
+		->users()
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->orWhere('mail', '=', 'm.merkel@project-immobilien.com')
 		->orWhere('mail', '=', 'c.iskakova@project-immobilien.com')
 		->orWhere('mail', '=', 'v.drohn@project-immobilien.com')
+		->whereHas('title')
 		->sortBy('cn', 'asc')
 		->get();	
 
 		return $employees;
 	}
 
-	/**
-	 * Get all Employees by a given name
-	 * 
-	 * @param  string $name
-	 * @return object
-	 */
-	public function getEmployeesByName($name){
-
+	public static function getEmployeesByName($name)
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->orWhere('givenname', 'contains', $name)
 		->orWhere('sn', 'contains', $name)
+		->whereHas('title')
 		->get();	
 
 		return $employees;
 	}
 
-	/**
-	 * Get Employee by a name
-	 * 
-	 * @param  string $name
-	 * @return object
-	 */
-	public function getEmployeeByName($name){
-
+	public static function getEmployeeByName($name)
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->where('cn', '=', $name)
+		->whereHas('title')
 		->get();	
 		
 		return $employees;
 	}
 
-	/**
-	 * Get Employee by a name
-	 * 
-	 * @param  string $name
-	 * @return object
-	 */
-	public function getEmployeeByEmail($email){
-
+	public static function getEmployeeByEmail($email)
+	{
 		$employees = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->where('mail', '=', $email)
+		->whereHas('title')
 		->first();	
 		
 		return $employees;
 	}
 
-	/**
-	 * Get all Employees by a given $location
-	 * 
-	 * @param  string $location
-	 * @return object
-	 */
-	public function getEmployeesByLocation($location){
-
+	public static function getEmployeesByLocation($location)
+	{
 		$employeesLocation = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->where('l', '=', $location)
+		->whereHas('title')
 		->get();
 
 		return $employeesLocation;
 	}
 
-	/**
-	 * Get all Employees by a given $position
-	 * 
-	 * @param  string $position
-	 * @return object
-	 */
-	public function getEmployeesByPosition($department){
-
+	public static function getEmployeesByPosition($department)
+	{
 		$employeesLocation = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->where('department', '=', $department)
+		->whereHas('title')
 		->sortBy('cn', 'asc')
 		->get();
 
 		return $employeesLocation;
 	}
 
-	/**
-	 * Get all Employees by a given $location and a given $position
-	 * 
-	 * @param  string $location
-	 * @param  string $position
-	 * @return object
-	 */
-	public function getEmployeesByLocationAndPosition($location, $department){
-
+	public static function getEmployeesByLocationAndPosition($location, $department)
+	{
 		$employeesLocation = Adldap::connect()
 		->search()
 		->users()
-		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
+		->select('cn', 'mail', 'telephonenumber', 'title', 'company', 'l', 'whencreated', 'streetaddress', 'postalcode', 'department', 'thumbnailphoto', 'mobile')
 		->where('l', '=', $location)
 		->where('department', '=', $department)
+		->whereHas('title')
 		->get();
 
 		return $employeesLocation;
 	}
 
-	public function getCentralEmployeesByPosition($position){
+	public static function getCentralEmployeesByPosition($position)
+	{
 		return DB::table('zentrale')->where('abteilung', $position)->get();
 	}
 
-	public function getCentralEmployeesByLocationAndPosition($location, $position){
+	public static function getCentralEmployeesByLocationAndPosition($location, $position)
+	{
 		return DB::table('zentrale')->where('abteilung', $position)->where('standort', $location)->get();
 	}
 
-	public function getCentrals()
+	public static function getCentrals()
 	{
 		return  DB::table('zentrale')->orderBy('abteilung', 'asc')->orderBy('standort', 'asc')->paginate(15);
 	}
 
-	public function getEmployeesPositionAndDepartment()
+	public static function getEmployeesPositionAndDepartment()
 	{
 		return Adldap::connect()
 		->search()
@@ -215,16 +191,17 @@ class Employees extends Model
 		->get();
 	}
 
-	public function getEmailEmployees()
+	public static function getEmailEmployees()
 	{
 		return Adldap::connect()
 		->search()
 		->users()
 		->select('mail')
+		->whereHas('mail')
 		->get();
 	}
 
-	public function addCentral($data) 
+	public static function addCentral($data) 
 	{
 		DB::table('zentrale')->insert([
 			'zentrale' => $data['zentrale'],
@@ -236,17 +213,17 @@ class Employees extends Model
 		]);
 	}
 
-	public function removeCentralById($data) 
+	public static function removeCentralById($id) 
 	{
-		DB::table('zentrale')->where('id', $data['id'])->delete();
+		DB::table('zentrale')->where('id', $id)->delete();
 	}
 
-	public function showCentral($id)
+	public static function showCentral($id)
 	{
 		return DB::table('zentrale')->where('id', $id)->get()->first();
 	}
 
-	public function updateCentral($data) 
+	public static function updateCentral($data) 
 	{
 		DB::table('zentrale')
 		->where('id', $data['id'])
@@ -258,12 +235,36 @@ class Employees extends Model
 			'standort' => $data['standort'], 
 		]);
 
-		if(!empty($data['sekretariat'])){
+		if(!empty($data['sekretariat']))
+		{
 			DB::table('zentrale')
 			->where('id', $data['id'])
 			->update([
 				'sekretariat' => json_encode($data['sekretariat']),
 			]);
 		}
+	}	
+
+	public static function getEmployeesStefan() 
+	{
+		return Adldap::connect()
+		->search()
+		->users()
+		->select('cn', 'department', 'title', 'l', 'streetaddress')
+		->whereHas('title')
+		->sortBy('cn', 'asc')
+		->get();
+	}	
+
+	public static function getEmployeesStefanIMG() 
+	{
+		return Adldap::connect()
+		->search()
+		->users()
+		->select('cn', 'department', 'title', 'thumbnailphoto', 'l', 'streetaddress')
+		->whereHas('thumbnailphoto')
+		->whereHas('title')
+		->sortBy('cn', 'asc')
+		->get();
 	}	
 }

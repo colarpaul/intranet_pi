@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\Objects;
 use Illuminate\Http\Request;
+
+use App\Http\Models\Objects as Objects;
 
 class ObjectsController extends Controller
 {
@@ -18,101 +19,94 @@ class ObjectsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\Response
+     * Method: index()
+     *
+     * Rendering the OBJECTS page with all needed data
+     * page: /objekte
+     * 
+     * - objects = all objects
+     * - cities  = all cities from objects
      */
     public function index(Request $request)
     {
         $objectName = $request->input('name');
 
-        $objectsModel = new Objects();
         if($objectName){
-            $objects = $objectsModel->getAllObjectsWithName($objectName);
+            $objects = Objects::getAllObjectsWithName($objectName);
         } else {
-            $objects = $objectsModel->getActiveObjects();
+            $objects = Objects::getActiveObjects();
         }
 
-        $niederlassungen = $objectsModel->getBranches();
+        $niederlassungen = Objects::getBranches();
         foreach($niederlassungen as $niederlassung){
-            $cities[] = $objectsModel->getCities($niederlassung->niederlassung);
+            $cities[] = Objects::getCities($niederlassung->niederlassung);
         }
 
-        $data = array(
+        $data = [
             'objects' => $objects,
             'cities' => $cities,
-        );
+        ];
 
         return view('objects', $data);
     }
 
+    /**
+     * Method: getObjectInfo()
+     *
+     * Rendering the OBJECTS page with all needed data
+     * page: /service/getObjectInfo
+     * 
+     * - objects = all objects
+     * - cities  = all cities from objects
+     */
     public function getObjectInfo(Request $request)
     {
-        $serviceModel = new Objects();
-
         $objectId = $request->input('objectId');
-
-        $object = $serviceModel->showObject($objectId);
+        $object = Objects::showObject($objectId);
 
         return json_encode($object);
     }
 
     public function getObjectsByBranch(Request $request)
     {
-        $objectsModel = new Objects();
-
         $branch = $request->input('branch');
-
-        return $objectsModel->getObjectsByBranch($branch);
+        return Objects::getObjectsByBranch($branch);
     }
 
     public function getAllObjectsByCity(Request $request)
     {
-        $objectsModel = new Objects();
-
         $city = $request->input('city');
-
-        return $objectsModel->getAllObjectsByCity($city);
+        return Objects::getAllObjectsByCity($city);
     }
 
     public function getAllObjectsWithName(Request $request)
     {
-        $objectsModel = new Objects();
-
         $name = $request->input('name');
-
-        return $objectsModel->getAllObjectsWithName($name);
+        return Objects::getAllObjectsWithName($name);
     }
 
     public function getObjectWithId(Request $request)
     {
-        $objectsModel = new Objects();
-
         $objectId = $request->input('objectId');
-
-        return $objectsModel->getObjectWithId($objectId);
+        return Objects::getObjectWithId($objectId);
     }
 
     public function getAllObjects()
     {
-        $objectsModel = new Objects();
-
-        return $objectsModel->getActiveObjects();
+        return Objects::getActiveObjects();
     }
 
     public function updateObjectStatus(Request $request) 
     {
-        $objectModel = new Objects();
-
         $objectId = $request->input('id');
         $objectStatus = $request->input('status');
 
-        return $objectModel->updateObjectStatus($objectId, $objectStatus);
+        return Objects::updateObjectStatus($objectId, $objectStatus);
 
     }   
 
     public function updateObject(Request $request) 
     {
-        $objectModel = new Objects();
-
         $data = array(
             "id" => $request->input('objectId'),
             "name" => $request->input('objectName'),
@@ -125,28 +119,24 @@ class ObjectsController extends Controller
             "pdf" => $request->file('objectPDF'),
         );
 
-        $object = $objectModel->updateObject($data);
+        Objects::updateObject($data);
 
         return back();
     }   
 
     public function removeObject(Request $request) 
     {
-        $objectModel = new Objects();
-
         $data = array(
             'objectId' => $request->get('objectId'),
         );
 
-        $objectModel->removeObject($data);  
+        Objects::removeObject($data);  
 
         return true;
     }   
 
     public function addObject(Request $request) 
     {
-        $objectModel = new Objects();
-
         $objectNiederlassung = $request->input('objectNiederlassung');
         if($objectNiederlassung == 'Frankfurt'){
             $objectNiederlassung = 'Rhein-Main';
@@ -164,7 +154,7 @@ class ObjectsController extends Controller
             'objectDatum' => $request->input('objectDatum'),
         );
 
-        $objectModel->addObject($data);  
+        Objects::addObject($data);  
 
         return back();
     } 

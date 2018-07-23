@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\Gallery;
+use App\Http\Models\Gallery as Gallery;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
@@ -19,47 +18,36 @@ class GalleryController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * Method: index()
      *
-     * @return \Illuminate\Http\Response
+     * Rendering the GALLERY page with all images
+     * page: /bildgalerien
+     * 
+     * - images = all images
      */
     public function index(Request $request)
     {
-        // $images = Storage::disk('public_gallery')->allFiles();
-        // foreach($images as $key => $image){
-        //     if(substr($image, 0, 5) == 'modal'){
-        //         unset($images[$key]);
-        //     }
-        // }
-        // $galleryModel = new Gallery();
-        // $galleryModel->storeAllImages($images);
-
         setlocale (LC_TIME, 'German', 'de_DE', 'deu');
 
-        $galleryModel = new Gallery();
-
-        $images = $galleryModel->getAllImages();
-
-        $data = array(
-            'images' => $images,
-        );
-
-        return view('gallery', $data);
+        return view('gallery', ['images' => Gallery::getAllImages()]);
     }
 
-    public function getImagesByLocation($location){
-
+    /**
+     * Method: getImagesByLocation()
+     *
+     * Rendering the GALLERY page for a selected LOCATION
+     * page: /bildgalerien
+     * 
+     * - images = all images
+     */
+    public function getImagesByLocation($location)
+    {
         setlocale (LC_TIME, 'German', 'de_DE', 'deu');
 
-        $galleryModel = new Gallery();
-
-        $images = $galleryModel->getImagesByLocation($location);
-        $date = $galleryModel->getImagesDateByLocation($location);
-
-        $data = array(
-            'images' => $images,
-            'date' => $date,
-        );
+        $data = [
+            'images' => Gallery::getImagesByLocation($location),
+            'date'   => Gallery::getImagesDateByLocation($location),
+        ];
 
         return view('gallery', $data);
     }

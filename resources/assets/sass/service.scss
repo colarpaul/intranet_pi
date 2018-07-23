@@ -334,9 +334,6 @@ margin-bottom: 10px;
 display: table;
 width: 100%;
 }
-.divTableRow {
-display: table-row;
-}
 
 .divTableRow:nth-child(even){
 background: rgba(150, 92, 0, 0.08);
@@ -627,13 +624,12 @@ background: #F29400;
 color: white;
 }
 
-
 .faq {
 margin-right: 3rem;
 }
 
 .faq a {
-style="color: #F29400;
+color: #F29400;
 }
 
 .faq > li {
@@ -813,8 +809,8 @@ border: 1px solid #F29400;
 .documents-search-description {
     margin-bottom: 1rem; 
     float: right; 
-    width: 70%; 
     font-size: 20px;
+    width: 100%;
 }
 
 .faqSearchInput {

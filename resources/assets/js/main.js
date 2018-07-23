@@ -25,7 +25,7 @@ $( document ).ready(function() {
 
 		$.ajax({
 			type: 'POST',
-			url: '/employees/getEmployeeByEmail',
+			url: '/mitarbeiter/getEmployeeByEmail',
 			dataType: 'json',
 			headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 			data: { 'email': email }
@@ -338,7 +338,7 @@ $( "#feedback-form" ).submit(function( event ) {
 
 	$.ajax({
 		type: 'POST',
-		url: '/service/sendFeedbackEmail',
+		url: '/dokumente/sendFeedbackEmail',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'value': data }
@@ -364,7 +364,7 @@ $( "#support-form" ).submit(function( event ) {
 
 	$.ajax({
 		type: 'POST',
-		url: '/service/sendSupportEmail',
+		url: '/dokumente/sendSupportEmail',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'value': data }
@@ -496,7 +496,7 @@ function getDocumentWithId(documentId){
 
 	$.ajax({
 		type: 'POST',
-		url: '/service/getDocumentWithId',
+		url: '/dokumente/getDocumentWithId',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'documentId': documentId }
@@ -556,7 +556,7 @@ function getDocumentsByCityAndTelefon(city){
 
 	$.ajax({
 		type: 'POST',
-		url: '/service/getDocumentsByCityAndTelefon',
+		url: '/dokumente/getDocumentsByCityAndTelefon',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'city': city }
@@ -607,9 +607,9 @@ function getAllDocumentsWithValue(givenValue){
 	var url = null;
 
 	if(givenValue == 0){
-		url = '/service/getAllDocuments?page=' + page;
+		url = '/dokumente/getAllDocuments?page=' + page;
 	} else {
-		url = '/service/getAllDocumentsLikeValue';
+		url = '/dokumente/getAllDocumentsLikeValue';
 	}
 
 	$('.divTableCell').slideUp();
@@ -677,7 +677,7 @@ function getAllDocumentsWithValueAndPopupList(givenValue){
 	var data = [];
 	$.ajax({
 		type: 'POST',
-		url: '/service/getAllDocumentsLikeValueFirst5',
+		url: '/dokumente/getAllDocumentsLikeValueFirst5',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'value': givenValue }
@@ -717,7 +717,7 @@ function getAllFAQsWithValueAndPopupList(givenValue){
 	var data = [];
 	$.ajax({
 		type: 'POST',
-		url: '/service/getAllDocumentsLikeValueFirst5',
+		url: '/dokumente/getAllFAQSLikeValueFirst5',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'value': givenValue }
@@ -726,8 +726,8 @@ function getAllFAQsWithValueAndPopupList(givenValue){
 		var docs = data.documents;
 		var total = data.total;
 		if(docs.length > 0){
-			$('.searchbar-document-wrap2').html('');
-			$('.searchbar-document-wrap2').append('<ul class="searchbar-document-list">');
+			$('.searchbar-faq-wrap2').html('');
+			$('.searchbar-faq-wrap2').append('<ul class="searchbar-document-list">');
 			$.each(docs, function(index, value){
 				$('.searchbar-document-list').append('<li class="searchbar-document-result searchbar-document-result-' + value.id + '" data-id="'+ value.id + '">' + value.name + '</li>');
 				highlight(givenValue, value.id);
@@ -735,17 +735,17 @@ function getAllFAQsWithValueAndPopupList(givenValue){
 			if(total > 5){
 				$('.searchbar-document-list').append('<li class="more-document-results" data-value="' + givenValue + '  " style="background: white !important; color: #F29400 !important">... weitere Ergebnisse anzeigen</li>');
 			}
-			$('.searchbar-document-wrap2').append('</ul>');
+			$('.searchbar-faq-wrap2').append('</ul>');
 
-			$('.searchbar-document-wrap2').show();
+			$('.searchbar-faq-wrap2').show();
 
 		}else{
-			$('.searchbar-document-wrap2').html('');
-			$('.searchbar-document-wrap2').append('<ul class="ceva">');
+			$('.searchbar-faq-wrap2').html('');
+			$('.searchbar-faq-wrap2').append('<ul class="ceva">');
 			$('.ceva').append('<li> Keine Ergebnisse </li>');
-			$('.searchbar-document-wrap2').append('</ul>');
+			$('.searchbar-faq-wrap2').append('</ul>');
 
-			$('.searchbar-document-wrap2').show();
+			$('.searchbar-faq-wrap2').show();
 		}
 	});
 }
@@ -759,12 +759,12 @@ function getDocumentsByCategoryAndSubcategory(categoryId, subCategoryId){
 
 	if(subCategoryId == 0){
 		if(page == null){
-			url = '/service/'+categoryId+'/'+subCategoryId;
+			url = '/dokumente/'+categoryId+'/'+subCategoryId;
 		} else {
-			url = '/service/getAllDocuments?page=' + page;
+			url = '/dokumente/getAllDocuments?page=' + page;
 		}
 	} else {
-		url = '/service/'+categoryId+'/'+subCategoryId;
+		url = '/dokumente/'+categoryId+'/'+subCategoryId;
 	}
 
 	$('.divTableCell').slideUp();
@@ -825,14 +825,14 @@ function getDocumentsByCategoryName(categoryName){
 	if(categoryName == 'Meisgenutzte Dokumente' || categoryName == 'Alle Dokumente'){
 		$('.documents-container-description').html('Meisgenutzte Dokumente');
 		if(page == null){
-			window.location.href = "/dokumente-support/viewAllDocuments";
+			window.location.href = "/dokumente/alleDokumente";
 		} else {
 			var subCategoryId = 0;
-			url = '/service/getAllDocuments?page=' + page;
+			url = '/dokumente/getAllDocuments?page=' + page;
 		}
 	} else {
 		$('.documents-container-description').html(categoryName);
-		url = '/service/0/'+categoryName;
+		url = '/dokumente/0/'+categoryName;
 	}
 
 	$('.divTableCell').slideUp();
@@ -891,9 +891,9 @@ function getAllDocuments(){
 	var page = findGetParameter('page');
 
 	if(page == null){
-		url = '/service/getAllDocuments';
+		url = '/dokumente/getAllDocuments';
 	} else {
-		url = '/service/getAllDocuments?page=' + page;
+		url = '/dokumente/getAllDocuments?page=' + page;
 	}
 
 	$('.loading-container').show();
@@ -972,7 +972,7 @@ function getDocumentsBySubcategory(subCategoryId){
 	}, 500);
 
 	$.ajax({
-		url: '/service/0/' + subCategoryId
+		url: '/dokumente/0/' + subCategoryId
 	})
 	.done(function(data){
 		data = $.parseJSON(data);
@@ -1036,14 +1036,14 @@ $('.faq-bueroorganisation-fragenX').on('click', function(){
 	$('.faq-bueroorganisation-fragen').hide().fadeIn(1000);
 });
 
-$('.faq-personal-fragenX').on('click', function(){
+$('.faq-personalabteilung-fragenX').on('click', function(){
 	$('.faq-fragen').hide();
-	$('.faq-personal-fragen').hide().fadeIn(1000);
+	$('.faq-personalabteilung-fragen').hide().fadeIn(1000);
 });
 
-$('.faq-facilityManagement-fragenX').on('click', function(){
+$('.faq-facilitymanagement-fragenX').on('click', function(){
 	$('.faq-fragen').hide();
-	$('.faq-facilityManagement-fragen').hide().fadeIn(1000);
+	$('.faq-facilitymanagement-fragen').hide().fadeIn(1000);
 });
 
 $('.faq-reisestelle-fragenX').on('click', function(){
@@ -1065,8 +1065,6 @@ var $topRightNav = $(document).find('.nav-right.nav-menu');
 
 $(document).find('.navbar-burger').click(function()
 {
-
-	$(this).toggleClass('is-active').next().toggleClass('is-active');
 	$(this).toggleClass('is-active').next().toggleClass('is-active');
 });
 
@@ -1097,7 +1095,7 @@ $('.documentsTable .divTableRow').on('click', function(e){
 function updateClicksDocument(documentId){
 	$.ajax({
 		type: 'POST',
-		url: '/service/updateClicksDocument',
+		url: '/dokumente/updateClicksDocument',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'id': documentId }

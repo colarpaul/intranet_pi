@@ -117,7 +117,7 @@ function getObjectWithId(objectId)
 
 	$.ajax({
 		type: 'POST',
-		url: '/objects/getObjectWithId',
+		url: '/objekte/getObjectWithId',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'objectId': objectId }
@@ -179,7 +179,7 @@ function getAllObjects()
 	}, 500);
 
 	$.ajax({
-		url: '/objects/getAllObjects',
+		url: '/objekte/getAllObjects',
 		dataType: 'json',
 	})
 	.done(function(data){
@@ -240,7 +240,7 @@ function getObjectsByCity(city)
 
 	$.ajax({
 		type: 'POST',
-		url: '/objects/getAllObjectsByCity',
+		url: '/objekte/getAllObjectsByCity',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'city': city }
@@ -309,7 +309,7 @@ function getObjectsByName(name)
 
 	$.ajax({
 		type: 'POST',
-		url: '/objects/getAllObjectsWithName',
+		url: '/objekte/getAllObjectsWithName',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'name': name }
@@ -378,7 +378,7 @@ function getObjectsByBranch(branch){
 
 	$.ajax({
 		type: 'POST',
-		url: '/objects/getObjectsByBranch',
+		url: '/objekte/getObjectsByBranch',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'branch': branch }
@@ -444,7 +444,7 @@ function getAllObjectsWithNameAndPopupList(name)
 	var data = [];
 	$.ajax({
 		type: 'POST',
-		url: '/objects/getAllObjectsWithName',
+		url: '/objekte/getAllObjectsWithName',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'name': name }
@@ -476,7 +476,7 @@ function updateClicksFAQ(faqId)
 {
 	$.ajax({
 		type: 'POST',
-		url: '/service/updateClicksFAQ',
+		url: '/dokumente/updateClicksFAQ',
 		dataType: 'json',
 		headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
 		data: { 'id': faqId }

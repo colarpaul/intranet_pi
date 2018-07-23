@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\Reviews;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+
+use App\Http\Models\Reviews as Reviews;
 
 class ReviewsController extends Controller
 {
@@ -17,17 +18,16 @@ class ReviewsController extends Controller
     {
         // $this->middleware('auth');
     }
+
     /**
-     * Show the application dashboard.
-     * 
-     * @return \Illuminate\Http\Response
+     * Method: addReview()
+     *
+     * This method was created for FEEDBACK/REVIEWS FORM from NEWS
      */
     public function addReview(Request $request)
     {   
-        $reviewsModel = new Reviews();
-
-        $data = array(
-            'who' => Cookie::get('laravel_session'),
+        $data = [
+            'who'       => Cookie::get('laravel_session'),
             'question1' => $request->input('question1'),
             'question2' => json_encode($request->input('question2')),
             'question3' => json_encode($request->input('question3')),
@@ -36,9 +36,9 @@ class ReviewsController extends Controller
             'question6' => $request->input('question6'),
             'question7' => $request->input('question7'),
             'question8' => $request->input('question8'),
-        );
+        ];
 
-        $reviewsModel->addReview($data); 
+        Reviews::addReview($data); 
 
         return back();
     }

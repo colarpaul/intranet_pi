@@ -10,7 +10,7 @@
         <div class="objects-search-title">Mitarbeitersuche</div>
         <div class="documents-search-description">Alle PROJECT Immobilien Kollegen im Überblick</div>
         <div  class="employees-search-wrap">
-            <div  style="position: relative">
+            <div class="relative">
                 <input class="searchbar-field-employees" type="text" placeholder="Namen eingeben"><i class="searchbar-span2 searchbar-span-employees fa fa-search" aria-hidden="true"></i>
             </div>
             <div class="searchbar-employees-wrap">
@@ -64,17 +64,17 @@
                 </div>
                 <div class="columns is-multiline is-mobile employees-table">
                     @foreach($employees as $key => $employee)
-                    <div class="column is-12-mobile is-4-desktop employee-wraper" data-id="{{ $key }}" data-email=" {{ $employee['mail'] }} ">
+                    <div class="column is-12-mobile is-4-desktop employee-wraper" data-id="{{ $key }}" data-email=" {{ $employee->mail[0] }} ">
                         <div class="employee-wraper-special">
-                            @if(!empty($employee['thumbnailphoto']))
-                            <div class="employee-image" style="background: url('data:image/jpeg;base64,{{ $employee['thumbnailphoto'] }}')"></div>
+                            @if(!empty($employee->thumbnailphoto[0]))
+                            <div class="employee-image" style="background: url('data:image/jpeg;base64,{{ base64_encode($employee->thumbnailphoto[0]) }}')"></div>
                             @else
                             <div class="employee-image" style="background: url('/images/profile-image-example.png')"></div>
                             @endif
                             <div class="employee-info1">
-                                <div><span class="grau">Name: </span> {{ $employee['cn'] }}</div>
-                                <div><span class="grau">Position: </span>{{ $employee['title'] }}</div>
-                                <div><span class="grau">Ort: </span>{{ $employee['l'] }}</div>
+                                <div><span class="grau">Name: </span> {{ $employee->cn[0] }}</div>
+                                <div><span class="grau">Position: </span>{{ $employee->title[0] }}</div>
+                                <div><span class="grau">Ort: </span>{{ $employee->l[0] }}</div>
                             </div>
                         </div>
                     </div>

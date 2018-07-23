@@ -27,8 +27,8 @@
 				<h2 class="pi-color">PROJECT Intern</h2>
 			</div>
 			@foreach($news as $new)
-			<div class="news-wrap columns is-multiline is-mobile">
-				<a class="column is-4-desktop column-new is-5-tablet is-12-mobile" href="/projectintern/{{ $new->id }}"><div class="news-image-wrap column is-4-desktop is-5-tablet is-12-mobile" style="background: url('{{ $new->bild_teaser }}');" >
+				<div class="search-news-results columns is-mobile is-multiline">
+				<a class="news-image column is-4-desktop is-5-tablet is-12-mobile" href="/projectintern/{{ $new->id }}"><div class="news-image-wrap" style="background: url('{{ $new->bild_teaser }}');" >
 				</div></a>
 				<div class="news-desc-wrap column is-8-desktop is-7-tablet is-12-mobile">
 					<div class="grau">{{ date('d.m.Y', strtotime($new->datum)) }} | {{ $new->news_art }}</div>
@@ -50,59 +50,19 @@
 			</div>
 			<div class="columns is-multiline is-mobile employees-table" >
 				@foreach($employees as $key => $employee)
-				<div class="column is-12-mobile is-4-desktop employee-wraper" data-id="{{ $key }}">
-					@if(!empty($employee['thumbnailphoto']))
-					<div class="employee-image" style="background: url('data:image/jpeg;base64,{{ $employee['thumbnailphoto'] }}')"></div>
-					@else
-					<div class="employee-image" style="background: url('/images/profile-image-example.png')"></div>
-					@endif
-					<div class="employee-info1">
-						<div><span class="grau">Name: </span> {{ $employee['cn'] }}</div>
-						<div><span class="grau">Position: </span>{{ $employee['title'] }}</div>
-						<div><span class="grau">Ort: </span>{{ $employee['l'] }}</div>
+				<div class="column is-12-mobile is-4-desktop employee-wraper" data-id="{{ $key }}" data-email=" {{ $employee['mail'] }} ">
+					<div class="employee-wraper-special">
+						@if(!empty($employee['thumbnailphoto']))
+						<div class="employee-image" style="background: url('data:image/jpeg;base64,{{ $employee['thumbnailphoto'] }}')"></div>
+						@else
+						<div class="employee-image" style="background: url('/images/profile-image-example.png')"></div>
+						@endif
+						<div class="employee-info1">
+							<div><span class="grau">Name: </span> {{ $employee['cn'] }}</div>
+							<div><span class="grau">Position: </span>{{ $employee['title'] }}</div>
+							<div><span class="grau">Ort: </span>{{ $employee['l'] }}</div>
+						</div>
 					</div>
-				</div>
-				<div class="modal-container modal-{{ $key }}">
-					@if(!empty($employee['thumbnailphoto']))
-					<div class="thumbnailphoto" style="background: url('data:image/jpeg;base64,{{ $employee['thumbnailphoto'] }}')">
-					</div>
-					@else
-					<div class="thumbnailphoto" style="background: url('/images/profile-image-example.png')">
-					</div>
-					@endif
-					<div><span class="grau">Name: </span> {{ $employee['cn'] }}</div>
-					<div><span class="grau">Position: </span> {{ $employee['title'] }}</div>
-					@if (!empty($employee['department'])) 
-					<div>
-						<span class="grau">Abteilung: </span> 
-						{{ $employee['department'] }}
-					</div>
-					@endif
-					<div><span class="grau">Ort: </span> {{ $employee['streetaddress'] . ', ' . $employee['postalcode'] . '&nbsp;' . $employee['l'] }}</div>
-					@if (!empty($employee['company']))
-					<div>
-						<span class="grau">Unternehmen: </span> 
-						{{ $employee['company'] }}
-					</div>
-					@endif
-					@if (!empty($employee['telephonenumber'])) 
-					<div>
-						<span class="grau">Telefon: </span> 
-						<a class="phone-web" href="tel:{{ $employee['telephonenumber'] }}"> {{ $employee['telephonenumber'] }}</a>
-					</div>
-					@endif
-					@if (!empty($employee['mobile'])) 
-					<div>
-						<span class="grau">Mobil: </span> 
-						<a class="phone-web" href="tel:{{ $employee['mobile'] }}"> {{ $employee['mobile'] }}</a>
-					</div>
-					@endif
-					@if (!empty($employee['mail']))
-					<div>
-						<span class="grau">E-Mail: </span> 
-						<a class="mail-web" href="mailto:{{ strtolower($employee['mail']) }}">{{ strtolower($employee['mail']) }}</a>
-					</div>
-					@endif
 				</div>
 				@endforeach
 			</div>
@@ -131,11 +91,12 @@
 			@endforeach
 			<hr>
 			@endif
+
 			@if(count($faqs) > 0)
 			<div class="news-title-container columns is-multiline is-gapless">
 				<h2 class="pi-color">FAQs</h2>
 			</div>
-			<ul class="faq faq-it-fragen faq-fragen">
+			<ul class="faq search-page-faq faq-it-fragen faq-fragen" style="display: block">
 				@foreach($faqs as $key => $faq)
 				<li class="accordian is-flex">
 					<i class="fa fa-angle-down"></i>
@@ -173,7 +134,7 @@
 			<hr>
 			@endif
 
-			@if((count($news) <= 0) AND (count($employees) <= 0) AND (count($documents) <= 0) AND (count($objects) <= 0))
+			@if((count($news) <= 0) AND (count($employees) <= 0) AND (count($documents) <= 0) AND (count($objects) <= 0) AND (count($faqs) <= 0))
 			<div class="news-title-container columns is-multiline is-gapless">
 				@if(empty($searchKey))
 				<h2 class="pi-color">Bitte geben Sie einen Suchbegriff ein.</h2>
@@ -188,15 +149,33 @@
 </div>
 </div>
 
-<div class="modal-container modal-faq-employee-container">
-	<div class="imageModalEmployee"></div>
-	<div class="nameModalEmployee"><span>Name: </span><span class="spanName"></span></div>
-	<div class="titleModalEmployee"><span>Titel: </span><span class="spanTitle"></span></div>
-	<div class="departmentModalEmployee"><span>Abteilung: </span><span class="spanDepartment"></span></div>
-	<div class="locationModalEmployee"><span>Ort: </span><span class="spanLocation"></span></div>
-	<div class="companyModalEmployee"><span>Unternehmen: </span><span class="spanCompany"></span></div>
-	<div class="phoneModalEmployee"><span>Telefon: </span><a class="phone-web spanPhone"></a></div>
-	<div class="emailModalEmployee"><span>Email: </span><a class="mail-web spanEmail"></a></div>
+<div class="modal-container employeeModal relative">
+    <a class="downloadVCard"><i class="fa fa-address-card vCardImage"></i></a>
+    <div class="employeeThumbnailphoto">
+    </div>
+    <div><span class="grau">Name: </span> <span class="employeeName"></span></div>
+    <div><span class="grau">Position: </span> <span class="employeeTitle"></span></div>
+    <div>
+        <span class="grau">Abteilung: <span class="employeeAbteilung"></span></span> 
+    </div>
+    <div>
+        <span class="grau">Ort: <span class="employeeLocation"></span></span> 
+    </div>
+    <div>
+        <span class="grau">Unternehmen: <span class="employeeUnternehmen"></span></span> 
+    </div>
+    <div>
+        <span class="grau">Telefon: </span> 
+        <a class="phone-web employeeTelefonnumberLink"> <span class="employeeTelefonnumber"></span></a>
+    </div>
+    <div>
+        <span class="grau">Mobil: </span> 
+        <a class="phone-web employeeMobileLink"> <span class="employeeMobile"></span></a>
+    </div>
+    <div>
+        <span class="grau">E-Mail: </span> 
+        <a class="mail-web employeeMailLink"><span class="employeeMail"></span></a>
+    </div>
 </div>
 
 @endsection

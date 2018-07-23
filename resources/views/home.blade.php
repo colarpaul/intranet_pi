@@ -5,18 +5,18 @@
 @endsection
 
 @section('content.wallpaper-navbar')
-<div class="wallpaper-home relative" style="background-image: url({{ $homepageData->wallpaper }});">
+<div class="wallpaper-home relative" style="background-image: url({{ $headerHPData->wallpaper }});">
 	<div class="columns is-mobile">
 		<div class="home-objects-container has-text-right column is-5-desktop is-8-tablet is-11-mobile">
-			<div class="home-title">{{ $homepageData->titel }}</div>
-			<div class="home-subtitle">{{ $homepageData->untertitel }}</div>
+			<div class="home-title">{{ $headerHPData->titel }}</div>
+			<div class="home-subtitle">{{ $headerHPData->untertitel }}</div>
 			<div class="more-info-button">
-				<a href="{{ $homepageData->button_url }}">
+				<a href="{{ $headerHPData->button_url }}">
 					<div class="info">
 						<i class="fa fa-info-circle" aria-hidden="true"></i>
 					</div>
 					<div class="desc">
-						{{ $homepageData->button_name }}
+						{{ $headerHPData->button_name }}
 					</div>
 				</a>
 			</div>
@@ -34,7 +34,7 @@
 			</div>
 			@foreach($lastNews as $lastNew)
 			<div class="news-wrap columns is-multiline is-mobile">
-				<a class="column is-4-desktop is-5-tablet is-12-mobile padding-0" href="/projectintern/{{ $lastNew->id }}"><div class="news-image-wrap column is-4-desktop is-5-tablet is-12-mobile" >
+				<a class="column is-4-desktop is-5-tablet is-12-mobile padding-0" href="/projectintern/{{ $lastNew->id }}"><div class="news-image-wrap column is-4-desktop is-5-tablet is-12-mobile" style="background: url('{{ $lastNew->bild_teaser }}'); width: 100%;">
 				</div></a>
 				<div class="news-desc-wrap column is-8-desktop is-7-tablet is-12-mobile">
 					<div class="grau">{{ date('d.m.Y', strtotime($lastNew->datum)) }} | {{ $lastNew->news_art }}</div>
@@ -50,6 +50,28 @@
 			@endforeach
 		</div>
 		<div class="column is-4-tablet is-11-mobile">
+
+			@if(!empty($homeMessageData->title) && !empty($homeMessageData->message))
+			<div class="employees-header">
+				<h2>{{ $homeMessageData->title }}</h2>
+			</div>
+			<div class="documents-container-help" style="
+			margin-bottom: 2rem;
+			background: rgba(150, 92, 0, 0.08);
+			color: #4a4a5b;
+			margin-top: 1rem;
+			border: 1px solid orange;
+			font-weight: 00;
+			border-radius: 0 0 15px 0;
+			">
+
+				<div class="doc-help-description">
+					{!! $homeMessageData->message !!}
+				</div>
+			</div>
+			@endif
+
+			
 			<div class="employees-header">
 				<h2>Mitarbeiter </h2>&nbsp;&nbsp;<a class="link-web" href="/mitarbeiter">[Alle Mitarbeiter anzeigen]</a>
 			</div>
@@ -115,7 +137,7 @@
 							Neueste Dokumente
 						</div>
 						<div class="home-objects-button column is-6-tablet is-12-mobile">
-							<a href="/dokumente-support">
+							<a href="/dokumente">
 								[Alle Dokumente anzeigen]
 							</a>
 						</div>
@@ -138,7 +160,6 @@
 							</a>
 						</div>
 						@endforeach
-
 					</div>
 				</div>
 			</div>

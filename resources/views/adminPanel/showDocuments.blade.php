@@ -20,7 +20,7 @@
                         <th scope="col">Name</th>
                         <th scope="col">Kategorie</th>
                         <th scope="col">Unterkategorie</th>
-                        <th scope="col">Datum</th>
+                        <!-- <th scope="col">Datum</th> -->
                         <th scope="col">Home</th>
                         <th scope="col">Aktion</th>
                     </tr>
@@ -50,9 +50,9 @@
                                 @endforeach
                             </span>
                             @endforeach <br>
-                            @endif
+                            @endif 
                         </td>
-                        <td class="documentDatum-{{ $key }}" data-documentDatum="{{ $document->datum }}" data-documentId="{{ $document->id }}">{{ $document->datum }}</td>
+                        <!-- <td class="documentDatum-{{ $key }}" data-documentDatum="{{ $document->datum }}" data-documentId="{{ $document->id }}">{{ $document->datum }}</td> -->
                         <td>
                             <label class="document-publish-switcher" ><input type="checkbox" data-documentId="{{ $document->id }}" class="ios-switch green" {{ $document->publish == 1 ? 'checked' : '' }} /><div><div></div></div></label>
                         </td>
@@ -70,7 +70,7 @@
             <div class="col col-add-form">
                 <div class="col-add-form-title">Dokument hinzufügen</div>
                 <div>
-                    <form method="POST" action="{{ action('ServiceController@addDocument') }}" enctype="multipart/form-data" class="form-add-document" style="margin-top: 20px;">
+                    <form method="POST" action="{{ action('DocumentsController@addDocument') }}" enctype="multipart/form-data" class="form-add-document" style="margin-top: 20px;">
                         <table style="height: 255px">
                             <tr>
                                 <td class="add-description">
@@ -134,7 +134,7 @@
             <div class="col col-add-form">
                 <div class="col-add-form-title">Kategorie hinzufügen</div>
                 <div>
-                    <form method="POST" action="{{ action('ServiceController@addCategory') }}" enctype="multipart/form-data" style="margin-top: 20px;">
+                    <form method="POST" action="{{ action('DocumentsController@addCategory') }}" enctype="multipart/form-data" style="margin-top: 20px;">
                         <table>
                             <tr>
                                 <td class="add-description">
@@ -166,7 +166,7 @@
         <div class="col col-add-form">
             <div class="col-add-form-title">Unterkategorie hinzufügen</div>
             <div>
-                <form method="POST" action="{{ action('ServiceController@addSubcategory') }}" enctype="multipart/form-data" style="margin-top: 20px;">
+                <form method="POST" action="{{ action('DocumentsController@addSubcategory') }}" enctype="multipart/form-data" style="margin-top: 20px;">
                     <table>
                         <tr>
                             <td class="add-description">
@@ -218,7 +218,7 @@
 </div>
 
 <div class="modal-container modal-document-container" style="display: none; background: white; min-width: 35%">
-    <form method="POST" action="{{ action('ServiceController@updateDocumentName') }}" enctype="multipart/form-data" class="form-add-document" style="margin: 30px">
+    <form method="POST" action="{{ action('DocumentsController@updateDocumentName') }}" enctype="multipart/form-data" class="form-add-document" style="margin: 30px">
         <div class="row">
             <div class="col col-md-12" >
                 <div class="divTable">
@@ -273,14 +273,14 @@
                         </select>
                     </div>
                 </div>
-                <div class="divTableRow">
+                <!-- <div class="divTableRow">
                     <div class="divTableCell" style="text-align: right; width: 150px;">
                         Datum:
                     </div>
                     <div class="divTableCell">
                         <input type="date" class="documentDatumInput" name="documentDatum" required style="width: 100%"></input>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

@@ -7,7 +7,7 @@
 		<div class="col col-add-form">
 			<div class="col-add-form-title">WLAN Banner Settings</div>
 			<div>
-				<form method="POST" action="{{ action('ServiceController@updateWLANBanner') }}" enctype="multipart/form-data" style="margin-top: 20px;">
+				<form method="POST" action="{{ action('DocumentsController@updateWLANBanner') }}" enctype="multipart/form-data" style="margin-top: 20px;">
 					<table style="width: 100%;">
 						<tr>
 							<td style="width: 150px;">

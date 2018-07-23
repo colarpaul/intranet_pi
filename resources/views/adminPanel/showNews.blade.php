@@ -32,7 +32,7 @@
 						<th scope="col">Bild Header</th>
 						<th scope="col">Art</th>
 						<th scope="col">Datum</th>
-						<th scope="col">GO-LIVE</th>
+						<!-- <th scope="col">GO-LIVE</th> -->
 						<th scope="col">Home</th>
 						<th scope="col">Publish</th>
 						<th scope="col">Aktion</th>
@@ -56,11 +56,11 @@
 								{{ date('d M Y', strtotime($new->datum)) }}
 							</span>
 						</td>
-						<td>
+						<!-- <td>
 							<span class="subcategory-span" style="background: #3bb8e2">
 								{{ date('d M Y', strtotime($new->datum)) }}
 							</span>
-						</td>
+						</td> -->
 						<td>
 							<label class="new-homepublish-switcher" ><input type="checkbox" data-newId="{{ $new->id }}" class="ios-switch green" {{ $new->home_publish == 1 ? 'checked' : '' }} /><div><div></div></div></label>
 						</td>
@@ -108,14 +108,14 @@
 												<input type="date" name="newsDate" required style=""></input>
 											</div>
 										</div>
-										<div class="divTableRow">
+										<!-- <div class="divTableRow">
 											<div class="divTableCell" style="text-align: right; width: 150px;">
 												GO-LIVE Datum: <span style="color: red">*</span>
 											</div>
 											<div class="divTableCell">
 												<input type="date" name="newsGoLiveDate" required style=""></input>
 											</div>
-										</div>
+										</div> -->
 										<div class="divTableRow">
 											<div class="divTableCell" style="text-align: right; width: 150px;">
 												Titel: <span style="color: red">*</span>

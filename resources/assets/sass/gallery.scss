@@ -104,10 +104,6 @@ margin-bottom: 1.5rem;
 	color: #F29400
 }
 
-.footer {
-	margin-top: 3rem;
-}
-
 .more-info-button a{
 	background-color: transparent;
 }
@@ -163,7 +159,6 @@ margin-bottom: 1.5rem;
 }
 
 .news-image-wrap {
-	background: url('{{ $lastNew->bild_teaser }}'); 
 	width:100%; 
 	min-height: 160px
 }

@@ -48,7 +48,7 @@ line-height: 2.7rem;
 .more-info-button a:link, .more-info-button a:visited {
 display: flex;
 width: fit-content;
-background-color: #fff;
+background-color: transparent;
 border-radius: 5px 0 0 5px;
 }
 
@@ -999,11 +999,6 @@ iframe {
   font-size: 40px;
 }
 
-.documents-search-description {
-  font-size: 20px; 
-  margin-bottom: 10px;
-}
-
 .home-subtitle {
   font-size: 20px;
 }
@@ -1016,6 +1011,16 @@ iframe {
   width: 432px; 
   height: 288px; 
   overflow: hidden;
+}
+
+.search-news-results {
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.search-page-faq {
+  margin: 0 !important;
 }
 /* SEARCHBAR FIELD NAVBAR */
 .searchbar-field {
@@ -1353,9 +1358,6 @@ margin-bottom: 10px;
 display: table;
 width: 100%;
 }
-.divTableRow {
-display: table-row;
-}
 
 .divTableRow:nth-child(even){
 background: rgba(150, 92, 0, 0.08);
@@ -1646,13 +1648,12 @@ background: #F29400;
 color: white;
 }
 
-
 .faq {
 margin-right: 3rem;
 }
 
 .faq a {
-style="color: #F29400;
+color: #F29400;
 }
 
 .faq > li {
@@ -1832,8 +1833,8 @@ border: 1px solid #F29400;
 .documents-search-description {
     margin-bottom: 1rem; 
     float: right; 
-    width: 70%; 
     font-size: 20px;
+    width: 100%;
 }
 
 .faqSearchInput {
@@ -2172,6 +2173,10 @@ border: 1px solid #F29400;
 	border-radius: 50%;
 }
 
+.thumbnailphoto-employee {
+	border-radius: 50%;
+}
+
 .chosen-single div b {
 	display: none !important;
 }
@@ -2310,10 +2315,6 @@ margin-bottom: 1.5rem;
 	color: #F29400
 }
 
-.footer {
-	margin-top: 3rem;
-}
-
 .more-info-button a{
 	background-color: transparent;
 }
@@ -2369,7 +2370,6 @@ margin-bottom: 1.5rem;
 }
 
 .news-image-wrap {
-	background: url('{{ $lastNew->bild_teaser }}'); 
 	width:100%; 
 	min-height: 160px
 }

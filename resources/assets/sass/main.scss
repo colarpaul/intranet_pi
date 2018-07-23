@@ -48,7 +48,7 @@ line-height: 2.7rem;
 .more-info-button a:link, .more-info-button a:visited {
 display: flex;
 width: fit-content;
-background-color: #fff;
+background-color: transparent;
 border-radius: 5px 0 0 5px;
 }
 
@@ -999,11 +999,6 @@ iframe {
   font-size: 40px;
 }
 
-.documents-search-description {
-  font-size: 20px; 
-  margin-bottom: 10px;
-}
-
 .home-subtitle {
   font-size: 20px;
 }
@@ -1016,4 +1011,14 @@ iframe {
   width: 432px; 
   height: 288px; 
   overflow: hidden;
+}
+
+.search-news-results {
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+.search-page-faq {
+  margin: 0 !important;
 }

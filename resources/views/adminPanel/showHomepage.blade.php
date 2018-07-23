@@ -7,7 +7,7 @@
 		<div class="col col-add-form">
 			<div class="col-add-form-title">Homepage Data hinzufügen</div>
 			<div>
-				<form method="POST" action="{{ action('ServiceController@updateHomepageData') }}" enctype="multipart/form-data" style="margin-top: 20px;">
+				<form method="POST" action="{{ action('DocumentsController@updateHomepageData') }}" enctype="multipart/form-data" style="margin-top: 20px;">
 					<table style="height: 255px; width: 100%;">
 						<tr>
 							<div class="divTableCell" style="text-align: right; width: 150px;">Bild Liste: </div>
@@ -54,6 +54,40 @@
 						<tr>
 
 						</tr>
+					</table>
+					<button type="submit" class="custom-save-button">Submit</button>
+					<input name="_token" type="hidden" value="{{ csrf_token() }}"/>
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<div class="row" style="width: 50%; margin: auto; margin-top: 1rem">
+		<div class="col col-add-form">
+			<div class="col-add-form-title">Home Message Settings</div>
+			<div>
+				<form method="POST" action="{{ action('DocumentsController@updateHomeMessageData') }}" enctype="multipart/form-data" style="margin-top: 20px;">
+					<table style="width: 100%;">
+						<tr>
+							<td style="width: 150px;">
+								Title: 
+							</td>
+							<td>
+								<input style="width: 100%" type="text" name="messageTitle" value="{{ $homeMessageData->title }}" required></input>
+							</td>
+						</tr>
+						<tr>
+							<td style="width: 150px;">
+								Message: 
+							</td>
+							<td>
+								<textarea type="text" name="messageMessage" class="addFaqMeldunInput" required>{{ $homeMessageData->message }}</textarea>
+								Fontawesome Icons: <a href="https://fontawesome.com/icons?d=gallery" target="_blank">https://fontawesome.com/icons?d=gallery</a><br>
+								Titel: 18px <br>
+								Untertitel: 14px</span>
+							</td>
+						</tr>
+						
 					</table>
 					<button type="submit" class="custom-save-button">Submit</button>
 					<input name="_token" type="hidden" value="{{ csrf_token() }}"/>

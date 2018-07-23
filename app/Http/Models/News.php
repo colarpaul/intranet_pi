@@ -5,42 +5,31 @@ namespace App\Http\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
+use App\Http\Helpers\Helper as Helper;
 use Auth;
 
 class News extends Model
 {
-	public function getNews($paginate = null){
-
-		if($user = Auth::user()){
-			if($paginate){
-				$news = DB::table('news')
-				->where('publish', 1)
-				->orderBy('sortable', 'asc')
-				->paginate($paginate);
-			} else {
-				$news = DB::table('news')
-				->where('publish', 1)
-				->orderBy('sortable', 'asc')
-				->get();
-			}
+	public static function getNews($paginate = null)
+	{
+		if($paginate){
+			$news = DB::table('news')
+			->where('publish', 1)
+			->orderBy('sortable', 'asc')
+			->paginate($paginate);
 		} else {
-			if($paginate){
-				$news = DB::table('news')
-				->where('publish', 1)
-				->orderBy('sortable', 'asc')
-				->paginate($paginate);
-			} else {
-				$news = DB::table('news')
-				->where('publish', 1)
-				->orderBy('sortable', 'asc')
-				->get();
-			}
+			$news = DB::table('news')
+			->where('publish', 1)
+			->orderBy('sortable', 'asc')
+			->get();
 		}
 
 		return $news;
 	}
 
-	public function getNewsByKey($key){
+	public static function getNewsByKey($key)
+	{
 		$news = DB::table('news')
 		->where('news_art', 'like', '%'.$key.'%')
 		->orWhere('titel', 'like', '%'.$key.'%')
@@ -50,13 +39,15 @@ class News extends Model
 		->orWhere('pin_google', 'like', '%'.$key.'%')
 		->orWhere('pdf_button_name', 'like', '%'.$key.'%')
 		->orWhere('web_button_name', 'like', '%'.$key.'%')
+		->having('publish', '=' ,1)
 		->orderBy('sortable', 'asc')
 		->get();
 
 		return $news;
 	}
 
-	public function getNewsCMS($paginate = null){
+	public static function getNewsCMS($paginate = null)
+	{
 		if($paginate){
 			$news = DB::table('news')
 			->orderBy('sortable', 'asc')
@@ -70,25 +61,29 @@ class News extends Model
 		return $news;
 	}
 
-	public function getNewsSortable(){
-		$news = DB::table('news')
+	public static function getNewsSortable()
+	{
+		return DB::table('news')
 		->orderBy('sortable', 'asc')
 		->get();
-
-		return $news;
 	}
 
-	public function getNewsCategories(){
+	public static function getNewsCategories()
+	{
 		$newsCategories = DB::table('news')
 		->select('news_art')
-		->groupBy('news_art')
 		->orderBy('news_art', 'asc')
-		->get();
+		->groupBy('news_art')
+		->get()
+		->toArray();
+
+		$newsCategories = array_column($newsCategories, 'news_art');
 
 		return $newsCategories;
 	}
 
-	public function getHomeNews(){
+	public static function getHomeNews()
+	{
 		return DB::table('news')
 		->orderBy('sortable', 'asc')
 		->where('home_publish', 1)
@@ -97,7 +92,8 @@ class News extends Model
 		->get();
 	}
 
-	public function getNewsArt(){
+	public static function getNewsArt()
+	{
 		return DB::table('news')
 		->select('news_art')
 		->orderBy('news_art', 'asc')
@@ -105,8 +101,8 @@ class News extends Model
 		->get();
 	}
 
-	public function getAllNews($limit = null){
-		
+	public static function getAllNews($limit = null)
+	{
 		if($limit){
 			$news = DB::table('news')
 			->orderBy('sortable', 'asc')
@@ -121,7 +117,7 @@ class News extends Model
 		return $news;
 	}
 
-	public function showNews($id)
+	public static function showNews($id)
 	{
 		if(is_numeric($id))
 		{
@@ -136,25 +132,21 @@ class News extends Model
 			}
 		}
 		else {
-			$news = DB::table('news')->where('news_art', $id)->orderBy('datum', 'desc')->paginate(5);
+			$news = DB::table('news')->where('news_art', $id)->where('publish', 1)->orderBy('datum', 'desc')->paginate(5);
+			return $news;
 		}
 
-		return $news;
+		abort(404);
 	}
 
-	/**
-	 * Add news
-	 * 
-	 * @return array
-	 */
-	public function addNews($data) 
+	public static function addNews($data) 
 	{
 		if($data['newsPDF']){
 			$newsOriginalPDFName = $data['newsPDF']->getClientOriginalName();
 			$pathPDFParts = pathinfo($newsOriginalPDFName);
 			$newsPDFExtension = $pathPDFParts['extension'];
-			$newsPDFFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $data['newsTitel'].'.'.$newsPDFExtension));
-			$newsPDFPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsPDFFullName));
+			$newsPDFFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $data['newsTitel'].'.'.$newsPDFExtension));
+			$newsPDFPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsPDFFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['newsPDF'], $newsPDFFullName);
 		}
@@ -163,8 +155,8 @@ class News extends Model
 			$newsOriginalBildName = $data['newsBild']->getClientOriginalName();
 			$pathBildParts = pathinfo($newsOriginalBildName);
 			$newsBildExtension = $pathBildParts['extension'];
-			$newsBildFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalBildName));
-			$newsBildPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsBildFullName));
+			$newsBildFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalBildName));
+			$newsBildPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsBildFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['newsBild'], $newsBildFullName);
 		}
@@ -173,8 +165,8 @@ class News extends Model
 			$newsOriginalTeaserName = $data['newsTeaser']->getClientOriginalName();
 			$pathTeaserParts = pathinfo($newsOriginalTeaserName);
 			$newsTeaserExtension = $pathTeaserParts['extension'];
-			$newsTeaserFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalTeaserName));
-			$newsTeaserPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsTeaserFullName));
+			$newsTeaserFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalTeaserName));
+			$newsTeaserPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsTeaserFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['newsTeaser'], $newsTeaserFullName);
 		}
@@ -183,8 +175,8 @@ class News extends Model
 			$newsOriginalWallpaperName = $data['newsWallpaper']->getClientOriginalName();
 			$pathWallpaperParts = pathinfo($newsOriginalWallpaperName);
 			$newsWallpaperExtension = $pathWallpaperParts['extension'];
-			$newsWallpaperFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalWallpaperName));
-			$newsWallpaperPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsWallpaperFullName));
+			$newsWallpaperFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalWallpaperName));
+			$newsWallpaperPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsWallpaperFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['newsWallpaper'], $newsWallpaperFullName);
 		}
@@ -218,22 +210,12 @@ class News extends Model
 		]);
 	}
 
-	/**
-	 * Remove news by a given id
-	 * 
-	 * @return array
-	 */
-	public function removeNews($data) 
+	public static function removeNews($data) 
 	{
 		DB::table('news')->where('id', $data['newsId'])->delete();
 	}
-
-	/**
-	 * Update a object status
-	 * 
-	 * @return array
-	 */
-	public function updateNews($data) 
+	
+	public static function updateNews($data) 
 	{
 		DB::table('news')
 		->where('id', $data['id'])
@@ -253,12 +235,13 @@ class News extends Model
 			'pdf_button_name' => $data['pdf_button_name'],
 		]);
 
-		if($data['wallpaper']){
+		if($data['wallpaper'])
+		{
 			$newsOriginalWallpaperName = $data['wallpaper']->getClientOriginalName();
 			$pathWallpaperParts = pathinfo($newsOriginalWallpaperName);
 			$newsWallpaperExtension = $pathWallpaperParts['extension'];
-			$newsWallpaperFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalWallpaperName));
-			$newsWallpaperPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsWallpaperFullName));
+			$newsWallpaperFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalWallpaperName));
+			$newsWallpaperPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsWallpaperFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['wallpaper'], $newsWallpaperFullName);
 
@@ -269,12 +252,13 @@ class News extends Model
 			]);
 		}
 
-		if($data['bild_teaser']){
+		if($data['bild_teaser'])
+		{
 			$newsOriginalTeaserName = $data['bild_teaser']->getClientOriginalName();
 			$pathTeaserParts = pathinfo($newsOriginalTeaserName);
 			$newsTeaserExtension = $pathTeaserParts['extension'];
-			$newsTeaserFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalTeaserName));
-			$newsTeaserPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsTeaserFullName));
+			$newsTeaserFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalTeaserName));
+			$newsTeaserPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsTeaserFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['bild_teaser'], $newsTeaserFullName);
 
@@ -285,12 +269,13 @@ class News extends Model
 			]);
 		}
 
-		if($data['bild']){
+		if($data['bild'])
+		{
 			$newsOriginalBildName = $data['bild']->getClientOriginalName();
 			$pathBildParts = pathinfo($newsOriginalBildName);
 			$newsBildExtension = $pathBildParts['extension'];
-			$newsBildFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalBildName));
-			$newsBildPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsBildFullName));
+			$newsBildFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalBildName));
+			$newsBildPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsBildFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['bild'], $newsBildFullName);
 
@@ -301,12 +286,13 @@ class News extends Model
 			]);
 		}
 
-		if($data['pdf_button_url']){
+		if($data['pdf_button_url'])
+		{
 			$newsOriginalPDFName = $data['pdf_button_url']->getClientOriginalName();
 			$pathPDFParts = pathinfo($newsOriginalPDFName);
 			$newsPDFExtension = $pathPDFParts['extension'];
-			$newsPDFFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalPDFName));
-			$newsPDFPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsPDFFullName));
+			$newsPDFFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalPDFName));
+			$newsPDFPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/news/'.$newsPDFFullName));
 
 			Storage::disk('public_news_uploads')->putFileAs('', $data['pdf_button_url'], $newsPDFFullName);
 
@@ -318,7 +304,8 @@ class News extends Model
 		}
 	}	
 
-	public function updateNewsMeldung($data){
+	public static function updateNewsMeldung($data)
+	{
 		DB::table('news')
 		->where('id', $data['id'])
 		->update([
@@ -326,7 +313,7 @@ class News extends Model
 		]);
 	}
 
-	public function updateNewsSortable($data){
+	public static function updateNewsSortable($data){
 		foreach(json_decode($data) as $newsId => $sortableNr){
 			DB::table('news')
 			->where('id', $newsId)
@@ -336,7 +323,7 @@ class News extends Model
 		}
 	}
 
-	public function updateNewHomePublishStatus($newId, $status) 
+	public static function updateNewHomePublishStatus($newId, $status) 
 	{
 		DB::table('news')
 		->where('id', $newId)
@@ -345,26 +332,12 @@ class News extends Model
 		);
 	}	
 
-	public function updateNewPublishStatus($newId, $status) 
+	public static function updateNewPublishStatus($newId, $status) 
 	{
 		DB::table('news')
 		->where('id', $newId)
 		->update([
 			'publish' => $status]
 		);
-	}	
-
-	// CREATE NEW FOLDER WITH HELPER FUNCTIONS !!!
-	function transformGermanChars($string)
-	{
-		$string = str_replace("ä", "ae", $string);
-		$string = str_replace("ü", "ue", $string);
-		$string = str_replace("ö", "oe", $string);
-		$string = str_replace("Ä", "Ae", $string);
-		$string = str_replace("Ü", "Ue", $string);
-		$string = str_replace("Ö", "Oe", $string);
-		$string = str_replace("ß", "ss", $string);
-		$string = str_replace("´", "", $string);
-		return $string;
-	}	
+	}		
 }

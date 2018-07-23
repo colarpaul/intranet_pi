@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\Employees;
-use App\Http\Models\News;
-use App\Http\Models\Objects;
-use App\Http\Models\Gallery;
-use App\Http\Models\Service;
 use Illuminate\Http\Request;
-use Adldap\Laravel\Facades\Adldap;
+
+use App\Http\Models\News as News;
+use App\Http\Helpers\Helper as Helper;
+use App\Http\Models\Objects as Objects;
+use App\Http\Models\Service as Service;
+use App\Http\Models\Employees as Employees;
 
 class HomeController extends Controller
 {
@@ -23,155 +23,133 @@ class HomeController extends Controller
     }
 
     /**
-     * Show the application dashboard.
+     * Method: index()
      *
-     * @return \Illuminate\Http\Response
+     * Rendering the home(START) page with all needed data
+     * page: / or /start
+     * 
+     * - headerHPData     = header(image + title + text + button)
+     * - lastNews         =  last 3 news
+     * - employeesOfMonth = 3 random employees
+     * - newDocuments     = last 6 documents
+     * - wlan             = WLAN header(image + text)
      */
     public function index()
     {
-        // $employeesOfMonth = array();
-        $employeesModel = new Employees();
-
-        // $employees = $employeesModel->getHomeEmployees();
-        // $employees = $employeesModel->getHomeEmployees();
-        $employees = $employeesModel->getEmployeesWithImage();
-        
-        // $employees = $employeesModel->getEmployees();
-
+        $employees = Employees::getEmployeesWithImage();
         foreach($employees as $key => $employee){
-
-            if($employee->title[0] == ''){
-                unset($employees[$key]);
-            } else {
-                $employeesOfMonth[$key]['cn'] = $employee->cn[0];
-                $employeesOfMonth[$key]['company'] = $employee->company[0];
-                $employeesOfMonth[$key]['l'] = $employee->l[0];
-                $employeesOfMonth[$key]['department'] = $employee->department[0];
-                $employeesOfMonth[$key]['streetaddress'] = $employee->streetaddress[0];
-                $employeesOfMonth[$key]['postalcode'] = $employee->postalcode[0];
-                $employeesOfMonth[$key]['mail'] = $employee->mail[0];
-                $employeesOfMonth[$key]['title'] = $employee->title[0];
-                $employeesOfMonth[$key]['telephonenumber'] = $employee->telephonenumber[0];
-                $employeesOfMonth[$key]['mobile'] = $employee->mobile[0];
-                $employeesOfMonth[$key]['whencreated'] = substr($employee->whencreated[0], 0, 4).'-'.substr($employee->whencreated[0], 4, 2).'-'.substr($employee->whencreated[0], 6, 2);
-                $employeesOfMonth[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-            }
-
+            $randomEmployees[$key] = $this->generateEmployeeData($employee);
         }
 
-        shuffle($employeesOfMonth);
-        $employeesOfMonth = array_splice($employeesOfMonth, 0, 3);
+        shuffle($randomEmployees);
+        $randomEmployees = array_splice($randomEmployees, 0, 3);
 
-        // usort($employeesOfMonth, function ($a, $b) {
-        //     return strnatcmp($a['whencreated'], $b['whencreated']);
-        // });
+        //NEWS
+        $lastNews = News::getHomeNews(3);
 
-        // $todayDate = date("Y-m-d", strtotime("-1 month", strtotime(date('Y-m-d'))));
+        //HOMEPAGE
+        $headerHPData    = Service::getHomepageData();
+        $homeMessageData = Service::getHomeMessage();
+        $wlan            = Service::getWLANData();
 
-        // $employeesOfMonth = array_reverse($employeesOfMonth);
-        // foreach($employeesOfMonth as $key => $employee){
-        //     if(!empty($employeesOfMonth[$key])){
-        //         if($employeesOfMonth[$key]['whencreated'] > $todayDate){
-        //             unset($employeesOfMonth[$key]);
-        //         }
-        //     }
-        // }
-        // $employeesOfMonth = array_splice($employeesOfMonth, 0, 3);
+        //DOKUMENTE
+        $newDocuments = Service::getNewDocuments();
 
-        $objectsModel = new Objects();
-        $lastObjects = $objectsModel->getLastAddedObjects();
-
-        // $galleryModel = new Gallery();
-        // $lastImages = $galleryModel->getLastAddedImages();
-
-        $newsModel = new News();
-        $lastNews = $newsModel->getHomeNews(3);
-
-        $serviceModel = new Service();
-        $homepageData = $serviceModel->getHomepageData();
-        $wlan = $serviceModel->getWLANData();
-
-        $newDocuments = $serviceModel->getNewDocuments();
-
-        $data = array(
-            'employeesOfMonth' => $employeesOfMonth,
-            'lastObjects' => $lastObjects,
-            'newDocuments' => $newDocuments,
-            // 'lastImages' => $lastImages,
-            'lastNews' => $lastNews,
-            'homepageData' => $homepageData,
-            'wlan' => $wlan,
-        );
+        $data = [
+            'employeesOfMonth' => $randomEmployees,
+            'newDocuments'     => $newDocuments,
+            'lastNews'         => $lastNews,
+            'headerHPData'     => $headerHPData,
+            'wlan'             => $wlan,
+            'homeMessageData'  => $homeMessageData,
+        ];
 
         return view('home', $data);
     }
-
-    public function suche(Request $request){
-
+    
+    /**
+     * Method: suche()
+     *
+     * Rendering the SEARCH page with all needed data for a given key
+     * page: /suche + ?key="example"
+     * 
+     * If key exists, data will contain:
+     * (it will look in whole database/table for the given key.)
+     * - documents 
+     * - faqs
+     * - objects
+     * - employees
+     * - news
+     */
+    public function suche(Request $request)
+    {
         $searchKey = $request->get('key');
         if($searchKey){
-
             //NEWS
-            $newsModel = new News();
-            $news = $newsModel->getNewsByKey($searchKey);
+            $news = News::getNewsByKey($searchKey);
 
             //EMPLOYEES
-            $employeesModel = new Employees();
-            $employees = $employeesModel->getEmployeesByKey($searchKey);
+            $employees = Employees::getEmployeesByKey($searchKey);
 
-            $parsedEmployees = array();
+            $parsedEmployees = [];
             foreach($employees as $key => $employee){
-                if($employee->title[0] == ''){
-                    unset($employees[$key]);
-                } else {
-                    $parsedEmployees[$key]['cn'] = $employee->cn[0];
-                    $parsedEmployees[$key]['company'] = $employee->company[0];
-                    $parsedEmployees[$key]['l'] = $employee->l[0];
-                    $parsedEmployees[$key]['department'] = $employee->department[0];
-                    $parsedEmployees[$key]['streetaddress'] = $employee->streetaddress[0];
-                    $parsedEmployees[$key]['postalcode'] = $employee->postalcode[0];
-                    $parsedEmployees[$key]['mail'] = $employee->mail[0];
-                    $parsedEmployees[$key]['title'] = $employee->title[0];
-                    $parsedEmployees[$key]['telephonenumber'] = $employee->telephonenumber[0];
-                    $parsedEmployees[$key]['mobile'] = $employee->mobile[0];
-                    $parsedEmployees[$key]['whencreated'] = substr($employee->whencreated[0], 0, 4).'-'.substr($employee->whencreated[0], 4, 2).'-'.substr($employee->whencreated[0], 6, 2);
-                    $parsedEmployees[$key]['thumbnailphoto'] = base64_encode($employee->thumbnailphoto[0]);
-                }
-
+                $parsedEmployees[$key] = $this->generateEmployeeData($employee);
             }
 
             //DOKUMENTE
-            $serviceModel = new Service();
-            $documents = $serviceModel->getDocumentsByKey($searchKey);
+            $documents = Service::getDocumentsByKey($searchKey);
 
             //FAQS
-            $serviceModel = new Service();
-            $faqs = $serviceModel->getFAQsByKey($searchKey);
+            $faqs = Service::getFAQsByKey($searchKey);
 
             //OBJEKTS 
-            $objectsModel = new Objects();
-            $objects = $objectsModel->getObjectsByKey($searchKey);
+            $objects = Objects::getObjectsByKey($searchKey);
 
-            $data = array(
+            $data = [
                 'searchKey' => $searchKey,
-                'news' => $news,
+                'news'      => $news,
                 'employees' => $parsedEmployees,
                 'documents' => $documents,
-                'faqs' => $faqs,
-                'objects' => $objects,
-            );
+                'faqs'      => $faqs,
+                'objects'   => $objects,
+            ];
         } else {
-            $data = array(
+            $data = [
                 'searchKey' => '',
-                'news' => array(),
-                'employees' => array(),
-                'documents' => array(),
-                'faqs' => array(),
-                'objects' => array(),
-            );
+                'news'      => [],
+                'employees' => [],
+                'documents' => [],
+                'faqs'      => [],
+                'objects'   => [],
+            ];
         }
 
         return view('homeSearch', $data);
+    }
+
+    /**
+     * Method: generateEmployeeData()
+     *
+     * Create EMPLOYEES DATA in the needed format
+     */
+    public function generateEmployeeData($employee)
+    {
+        $data = [
+            'cn'              => $employee->cn[0],
+            'company'         => $employee->company[0],
+            'l'               => $employee->l[0],
+            'department'      => $employee->department[0],
+            'streetaddress'   => $employee->streetaddress[0],
+            'postalcode'      => $employee->postalcode[0],
+            'mail'            => $employee->mail[0],
+            'title'           => $employee->title[0],
+            'telephonenumber' => Helper::formatPhoneNumberByLocationAndStreet($employee->telephonenumber[0], $employee->l[0], $employee->streetaddress[0]),
+            'mobile'          => Helper::formatMobileNumberByLocation($employee->mobile[0], $employee->l[0]),
+            // whencreated'] = substr($employee->whencreated[0], 0, 4).'-'.substr($employee->whencreated[0], 4, 2).'-'.substr($employee->whencreated[0], 6, 2),
+            'thumbnailphoto'  => base64_encode($employee->thumbnailphoto[0]),
+        ];
+
+        return $data;
     }
 
 }

@@ -2,66 +2,53 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Models\News;
-use App\Http\Models\Reviews;
 use Illuminate\Http\Request;
-use Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Cookie;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
+
+use App\Http\Models\News as News;
+use App\Http\Models\Reviews as Reviews;
+
+use Auth;
 
 class NewsController extends Controller
 {
     /**
-     * Show the application dashboard.
+     * Method: index()
      *
-     * @return \Illuminate\Http\Response
+     * Rendering the NEWS page with all needed data
+     * page: /projectintern
+     * 
+     * - news = all news (if a NUMBER is given, this NUMBER is passed in Model for PAGINATION)
+     * - newsCategories = generated categories from news
      */
     public function index(Request $request)
     {
-        $newsModel = new News();
-
-        $news = $newsModel->getNews(5);
-        $newsCategories = $newsModel->getNewsCategories();
-
-        $newsCategoriesArray = array();
-        foreach($newsCategories->toArray() as $category){
-            $newsCategoriesArray[] = $category->news_art;
-        }
-
-        $data = array(
-            'news' => $news,
-            'newsCategories' => $newsCategoriesArray,
-        );
+        $data = [
+            'news'           => News::getNews(5),
+            'newsCategories' => News::getNewsCategories(),
+        ];
 
         return view('news', $data);
     }
 
     /**
-     * Show a new by a given id
+     * Method: index()
+     *
+     * Rendering the NEWS page (PRO ID) with all needed data
+     * page: /projectintern/{id}
      * 
-     * @param  int $newsId 
-     * @return array
+     * - news = all news (If ID is passed, it will return the requested NEWS for that ID)
+     * - newsCategories = generated categories from news
+     * - hasReviewed = verify if a user has this news reviewed or not (Example: Feedback/Reviews FORM NEWS for INTRANET)
      */
-    public function showNews($newsId){
-        Artisan::call('cache:clear');
-
-        $newsModel = new News();
-        $reviewsModel = new Reviews();
-
-        $news = $newsModel->showNews($newsId);
-        $newsCategories = $newsModel->getNewsCategories();
-
-        $newsCategoriesArray = array();
-        foreach($newsCategories->toArray() as $category){
-            $newsCategoriesArray[] = $category->news_art;
-        }
-
-        $data = array(
-            'news' => $news,
-            'newsCategories' => $newsCategoriesArray,
-            'hasReviewed' => $reviewsModel->hasReviewed(Cookie::get('laravel_session')),
-        );
+    public function showNews($newsId)
+    {
+        $data = [
+            'news'           => News::showNews($newsId),
+            'newsCategories' => News::getNewsCategories(),
+            'hasReviewed'    => Reviews::hasReviewed(Cookie::get('laravel_session')),
+        ];
 
         if(is_numeric($newsId)){
             return view('showNews', $data);
@@ -71,129 +58,142 @@ class NewsController extends Controller
     }
 
     /**
-     * Adding a new in database
+     * Method: addNews()
+     *
+     * This method is used in ADMIN PANEL(CMS) for adding NEWS to DATABASE.
+     * page: /cms/news - add news form
      * 
-     * @param Request $request
+     * DATA come from INPUT FORM
      */
     public function addNews(Request $request){
 
-        $newsModel = new News();
-
-        $data = array(
-            'newsArt' => $request->input('newsArt'),
-            'newsObject' => 0,
-            'newsDatum' => $request->input('newsDate'),
-            'newsTitel' => $request->input('newsTitel'),
-            'newsUntertitel' => $request->input('newsUntertitel'),
-            'newsMeldung' => $request->input('newsMeldung'),
+        $data = [
+            'newsArt'           => $request->input('newsArt'),
+            'newsObject'        => 0,
+            'newsDatum'         => $request->input('newsDate'),
+            'newsTitel'         => $request->input('newsTitel'),
+            'newsUntertitel'    => $request->input('newsUntertitel'),
+            'newsMeldung'       => $request->input('newsMeldung'),
             'newsBildUntertext' => $request->input('newsBildUntertext'),
             //BILD
-            'newsTeaser' => $request->file('newsTeaser'),
-            'newsBild' => $request->file('newsBild'),
-            'newsWallpaper' => $request->file('newsWallpaper'),
+            'newsTeaser'        => $request->file('newsTeaser'),
+            'newsBild'          => $request->file('newsBild'),
+            'newsWallpaper'     => $request->file('newsWallpaper'),
             //BUTTONS
-            'newsPDF' => $request->file('newsPDF'),
-            'newsPDFName' => $request->input('newsPDFName'),
-            'newsWEB' => $request->input('newsWEB'),
-            'newsWEBName' => $request->input('newsWEBName'),
+            'newsPDF'           => $request->file('newsPDF'),
+            'newsPDFName'       => $request->input('newsPDFName'),
+            'newsWEB'           => $request->input('newsWEB'),
+            'newsWEBName'       => $request->input('newsWEBName'),
             //GOOGLE
-            'newsLatitude' => $request->input('newsLatitude'),
-            'newsLongitude' => $request->input('newsLongitude'),
-            'newsGooglePIN' => $request->input('newsGooglePIN'),
+            'newsLatitude'      => $request->input('newsLatitude'),
+            'newsLongitude'     => $request->input('newsLongitude'),
+            'newsGooglePIN'     => $request->input('newsGooglePIN'),
             //YOUTUBE
-            'newsYoutube' => $request->input('newsYoutube'),
-        );
+            'newsYoutube'       => $request->input('newsYoutube'),
+        ];
 
-        $newsModel->addNews($data);  
+        News::addNews($data);  
 
         return back();
     }
 
     /**
-     * Remove news from database by a given id
+     * Method: removeNews()
+     *
+     * This method is used in ADMIN PANEL(CMS) for removing NEWS from DATABASE
+     * page: /cms/news - remove button from each news
      * 
-     * @param  Request $request
+     * DATA come from JS Ajax Call
+     * Ajax Call can be found in: 
+     * Folder: public/adminPanel/js/custom.js, 
+     * Function: removeNewsById()
      */
     public function removeNews(Request $request) 
     {
-        $newsModel = new News();
-
-        $data = array(
-            'newsId' => $request->get('newsId'),
-        );
-
-        $newsModel->removeNews($data);  
+        News::removeNews(['newsId' => $request->get('newsId')]);  
 
         return true;
     }   
 
     /**
-     * Get all datas from an new by a given id
+     * Method: getNewsInfo()
+     *
+     * This method is used in ADMIN PANEL(CMS) for getting NEWS info from DATABASE when you try to EDIT NEWS.
+     * page: /cms/news - edit button from each news
      * 
-     * @param  Request $request
-     * @return array
+     * DATA come from JS Ajax Call
+     * Ajax Call can be found in: 
+     * Folder: public/adminPanel/js/custom.js, 
+     * Function: getNewsInfo()
      */
-    public function getNewsInfo(Request $request){
-        $newsModel = new News();
-
+    public function getNewsInfo(Request $request)
+    {        
         $newsId = $request->input('newsId');
-
-        $news = $newsModel->showNews($newsId);
-
-        return json_encode($news);
+        
+        return json_encode(News::showNews($newsId));
     }
 
     /**
-     * Update new by given all necessary data as array
+     * Method: updateNews()
+     *
+     * This method is used in ADMIN PANEL(CMS) for getting NEWS info from DATABASE when you try to UPDATE NEWS.
+     * page: /cms/news - edit button > save from each news
      * 
-     * @param  Request $request
-     * @return true/back
+     * DATA come from JS Ajax Call
+     * Ajax Call can be found in: 
+     * Folder: public/adminPanel/js/custom.js, 
+     * Function: updateNews()
      */
     public function updateNews(Request $request){
-        $newsModel = new News();
 
-        $data = array(
-            "id" => $request->input('newsId'),
-            "bild_teaser" => $request->file('newsTeaser'),
-            "news_art" => $request->input('newsArt'),
-            "bild_unter" => $request->input('newsBildUntertext'),
-            "datum" => $request->input('newsDate'),
-            "titel" => $request->input('newsTitel'),
-            "untertitel" => $request->input('newsUntertitel'),
-            "meldung" => $request->input('newsMeldung'),
-            "meldung" => $request->input('newsMeldung'),
-            "web_button_url" => $request->input('newsWEBURL'),
+        $data = [
+            "id"              => $request->input('newsId'),
+            "bild_teaser"     => $request->file('newsTeaser'),
+            "news_art"        => $request->input('newsArt'),
+            "bild_unter"      => $request->input('newsBildUntertext'),
+            "datum"           => $request->input('newsDate'),
+            "titel"           => $request->input('newsTitel'),
+            "untertitel"      => $request->input('newsUntertitel'),
+            "meldung"         => $request->input('newsMeldung'),
+            "meldung"         => $request->input('newsMeldung'),
+            "web_button_url"  => $request->input('newsWEBURL'),
             "web_button_name" => $request->input('newsWEBName'),
-            "latitude" => $request->input('newsLatitude'),
-            "longitude" => $request->input('newsLongitude'),
-            'wallpaper' => $request->file('newsWallpaper'),
-            'bild' => $request->file('newsBild'),
-            'youtube' => $request->input('newsYoutube'),
-            'pin_google' => $request->input('newsGooglePIN'),
-            'pdf_button_url' => $request->file('newsPDF'),
+            "latitude"        => $request->input('newsLatitude'),
+            "longitude"       => $request->input('newsLongitude'),
+            'wallpaper'       => $request->file('newsWallpaper'),
+            'bild'            => $request->file('newsBild'),
+            'youtube'         => $request->input('newsYoutube'),
+            'pin_google'      => $request->input('newsGooglePIN'),
+            'pdf_button_url'  => $request->file('newsPDF'),
             'pdf_button_name' => $request->input('newsPDFName'),
-        );
+        ];
 
-        $news = $newsModel->updateNews($data);
+        $news = News::updateNews($data);
 
         return back();
     }
 
-    public function downloadImage($newsId){
+     /**
+     * Method: downloadImage()
+     *
+     * This method used to import images from FROALA editor.
+     * Once you are on NEWS page, take all FROALA images, imports into public file and generates a new link for it.
+     * page: /projectintern/[id] - click from /cms/news/ on news as logged user
+     */
+     public function downloadImage($newsId){
         if($user = Auth::user())
         {
-            $newsModel = new News();
-
-            $news = $newsModel->showNews($newsId);
+            $news      = News::showNews($newsId);
 
             $dom = new \DOMDocument();
             $dom->loadHTML($news->meldung);
 
-            foreach ($dom->getElementsByTagName('img') as $img) {
+            foreach ($dom->getElementsByTagName('img') as $img) 
+            {
                 $imageSRC = $img->getAttribute('src');
 
-                if(substr($imageSRC, 8, 12) == 'i.froala.com'){
-
+                if(substr($imageSRC, 8, 12) == 'i.froala.com')
+                {
                     $path = explode('?', $imageSRC, 2);
                     $path = $path[0];
                     $filename = basename($path);
@@ -207,17 +207,15 @@ class NewsController extends Controller
 
             $content = $dom->saveHTML();
 
-            $array1 = array('<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">', '<html>', '</html>', '<body>', '</body>');
-            $array2 = array('', '', '', '', '');
+            $array1 = ['<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">', '<html>', '</html>', '<body>', '</body>'];
+            $array2 = ['', '', '', '', ''];
 
-            $content = trim(str_replace($array1, $array2, $content));
+            $data = [
+                'id'      => $news->id,
+                'meldung' => trim(str_replace($array1, $array2, $content)),
+            ];
 
-            $data = array(
-                'id' => $news->id,
-                'meldung' => $content,
-            );
-
-            $newsModel->updateNewsMeldung($data);
+            News::updateNewsMeldung($data);
 
             return 'true';
         } 
@@ -225,38 +223,49 @@ class NewsController extends Controller
     }
 
     /**
-     * Update new by given all necessary data as array
-     * 
-     * @param  Request $request
-     * @return true/back
+     * Method: updateNewsSortable()
+     *
+     * This method is used to sortable in a ORDER all news in ADMIN PANEL(CMS)
+     * page: cms/news/sortable/
      */
-    public function updateNewsSortable(Request $request){
-        $newsModel = new News();
-
-        $data = $request->input('sortable');
-
-        $news = $newsModel->updateNewsSortable($data);
+    public function updateNewsSortable(Request $request)
+    {
+        News::updateNewsSortable($request->input('sortable'));
 
         return 'true';
     }
 
+    /**
+     * Method: updateNewHomePublishStatus()
+     *
+     * This method is used to put publishing NEWS on HOMEPAGE (/start) from ADMIN PANEL(CMS)
+     * page /cms/news - publish home button
+     *
+     * If button is green, news will appear on HOMEPAGE
+     * If red, otherwise
+     */
     public function updateNewHomePublishStatus(Request $request) 
     {
-        $newsModel = new News();
-
         $newId = $request->input('id');
         $newHomePublish = $request->input('home_publish');
 
-        return $newsModel->updateNewHomePublishStatus($newId, $newHomePublish);
+        return News::updateNewHomePublishStatus($newId, $newHomePublish);
     } 
 
+   /**
+     * Method: updateNewHomePublishStatus()
+     *
+     * This method is used to put publishing NEWS on NEWS PAGE (/projectintern) from ADMIN PANEL(CMS)
+     * page /cms/news - publish news button
+     *
+     * If button is green, news will appear on NEWS PAGE
+     * If red, otherwise
+     */
     public function updateNewPublishStatus(Request $request) 
     {
-        $newsModel = new News();
-
         $newId = $request->input('id');
         $newPublish = $request->input('publish');
 
-        return $newsModel->updateNewPublishStatus($newId, $newPublish);
+        return News::updateNewPublishStatus($newId, $newPublish);
     } 
 }

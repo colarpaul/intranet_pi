@@ -7,14 +7,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
+use App\Http\Helpers\Helper as Helper;
+
 class Service extends Model
 {
-	/**
-	 * Get all Documents
-	 * 
-	 * @return array
-	 */
-	public function getAllDocuments($datum = null) 
+	public static function getAllDocuments($datum = null) 
 	{
 		if($datum == 'desc'){
 			$documents = DB::table('dokumente')->orderBy('created_at', 'desc')->paginate(15);
@@ -25,14 +22,7 @@ class Service extends Model
 		return $documents;
 	}
 
-	/**
-	 * Get all Documents by a given $category and a given $subCategory
-	 * 
-	 * @param  string $category
-	 * @param  string $subCategory
-	 * @return array
-	 */
-	public function getDocumentsByCategoriesAndSubcategories($subCategory, $categoryName)
+	public static function getDocumentsByCategoriesAndSubcategories($subCategory, $categoryName)
 	{
 		if($categoryName == 'Alle Dokumente'){
 			$documents = DB::table('dokumente')->orderBy('name', 'asc')->get();
@@ -44,39 +34,21 @@ class Service extends Model
 		return array('data' => $documents);
 	}
 
-	/**
-	 * Get a Document by a given $documentId
-	 * 
-	 * @param  string $documentId
-	 * @return array
-	 */
-	public function getDocumentWithId($documentId) 
+	public static function getDocumentWithId($documentId) 
 	{
 		$documents = DB::table('dokumente')->where('id', $documentId)->get();
 
 		return $documents;
 	}
 
-	/**
-	 * Get all Documents by a given $value
-	 *
-	 * @param  string $value
-	 * @return array
-	 */
-	public function getAllDocumentsLikeValue($value, $limit = null) 
+	public static function getAllDocumentsLikeValue($value, $limit = null) 
 	{
 		$documents = DB::table('dokumente')->where('name', 'like', '%'.$value.'%')->orderBy('name', 'asc')->get();
 
 		return array('data' => $documents);
 	}
 
-	/**
-	 * Get first 5 found Documents by a given $value
-	 *
-	 * @param  string $value
-	 * @return array
-	 */
-	public function getAllDocumentsLikeValueFirst5($value) 
+	public static function getAllDocumentsLikeValueFirst5($value) 
 	{
 		$documents = DB::table('dokumente')->where('name', 'like', '%'.$value.'%')->take(5)->get();
 
@@ -87,32 +59,28 @@ class Service extends Model
 		return json_encode($data);
 	}
 
-	/**
-	 * Get all categories from Documents
-	 * 
-	 * @return array
-	 */
-	public function getAllDocumentCategories() 
+	public static function getAllFAQSLikeValueFirst5($value) 
+	{
+		$faqs = DB::table('faqs')->where('titel', 'like', '%'.$value.'%')->orWhere('meldung', 'like', '%'.$value.'%')->take(5)->get();
+
+		$countFAQs = DB::table('faqs')->where('titel', 'like', '%'.$value.'%')->orWhere('meldung', 'like', '%'.$value.'%')->count(); 
+
+		$data = array('faqs' => $faqs, 'total' => $countFAQs);
+
+		return json_encode($data);
+	}
+
+	public static function getAllDocumentCategories() 
 	{
 		return DB::table('kategorien_dokumente')->orderBy('name', 'asc')->get();
 	}
 
-	/**
-	 * Get all subCategories from Documents
-	 * 
-	 * @return array
-	 */
-	public function getAlldocumentSubcategories() 
+	public static function getAlldocumentSubcategories() 
 	{
 		return DB::table('unterkategorien_dokumente')->get();
 	}	
 
-	/**
-	 * Update a document
-	 * 
-	 * @return array
-	 */
-	public function updateDocumentName($documentId, $documentName) 
+	public static function updateDocumentName($documentId, $documentName) 
 	{
 		DB::table('dokumente')
 		->where('id', $documentId)
@@ -122,18 +90,13 @@ class Service extends Model
 		);
 	}	
 
-	/**
-	 * Add a document
-	 * 
-	 * @return array
-	 */
-	public function addDocument($data) 
+	public static function addDocument($data) 
 	{
 		$documentOriginalName = $data['documentFile']->getClientOriginalName();
 		$pathParts = pathinfo($documentOriginalName);
 		$documentExtension = $pathParts['extension'];
-		$documentFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $data['documentName'].'.'.$documentExtension));
-		$documentPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/pdf/'.$documentFullName));
+		$documentFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $data['documentName'].'.'.$documentExtension));
+		$documentPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/pdf/'.$documentFullName));
 		$documentSize = round((File::size($data['documentFile'])/1000));
 
 		Storage::disk('public_uploads')->putFileAs('', $data['documentFile'], $documentFullName);
@@ -149,12 +112,7 @@ class Service extends Model
 		);
 	}
 
-	/**
-	 * Add a faq
-	 * 
-	 * @return array
-	 */
-	public function addFAQs($data) 
+	public static function addFAQs($data) 
 	{
 		DB::table('faqs')->insert([
 			'titel' => $data['titel'],
@@ -165,24 +123,14 @@ class Service extends Model
 		]);
 	}
 
-	/**
-	 * Add a cateogry
-	 * 
-	 * @return array
-	 */
-	public function addCategory($data) 
+	public static function addCategory($data) 
 	{
 		DB::table('kategorien_dokumente')->insert([
 			'name' => $data['documentCategory']]
 		);
 	}
 
-	/**
-	 * Add a subcategory
-	 * 
-	 * @return array
-	 */
-	public function addSubcategory($data) 
+	public static function addSubcategory($data) 
 	{
 		DB::table('unterkategorien_dokumente')->insert([
 			'kategorie_id' => $data['documentCategory'],
@@ -190,52 +138,37 @@ class Service extends Model
 		);
 	}
 
-	/**
-	 * Add a subcategory
-	 * 
-	 * @return array
-	 */
-	public function removeDocument($data) 
+	public static function removeDocument($data) 
 	{
 		DB::table('dokumente')->where('id', $data['documentId'])->delete();
 	}
 
-	public function getDocumentsByCityAndTelefon($city) 
+	public static function getDocumentsByCityAndTelefon($city) 
 	{
 		return DB::table('dokumente')->where('kategorie', 11)->where('name', 'like', '%'.$city.'%')->get();
 	}
 
-	public function getDocumentsByKey($key){
+	public static function getDocumentsByKey($key)
+	{
 		return DB::table('dokumente')
 		->where('name', 'like', '%'.$key.'%')
 		->orderBy('sortable', 'asc')
 		->get();
 	}
 
-	/**
-	 * Add a subcategory
-	 * 
-	 * @return array
-	 */
-	public function removeCategory($data) 
+	public static function removeCategory($data) 
 	{
 		DB::table('kategorien_dokumente')->where('id', $data['categoryId'])->delete();
 		DB::table('unterkategorien_dokumente')->where('kategorie_id', $data['categoryId'])->delete();
 	}
 
-	/**
-	 * Add a subcategory
-	 * 
-	 * @return array
-	 */
-	public function removeSubcategory($data) 
+	public static function removeSubcategory($data) 
 	{
 		DB::table('unterkategorien_dokumente')->where('id', $data['subcategoryId'])->delete();
 	}
 
-	public function getDocumentsByCategory($category)
+	public static function getDocumentsByCategory($category)
 	{
-
 		$categoryId = DB::table('kategorien_dokumente')->where('name', $category)->first();
 		if(!empty($categoryId)){
 			return DB::table('dokumente')->where('kategorie', $categoryId->id)->paginate(50);
@@ -244,21 +177,48 @@ class Service extends Model
 		}	
 	}
 
-	public function getFAQs($category = NULL)
+	public static function getFAQs($category = NULL)
 	{
 		if($category){
-			return DB::table('faqs')->where('kategorie', $category)->where('publish', 1)->orderBy('sortable', 'asc')->get();
+			return DB::table('faqs')
+			->where('kategorie', $category)
+			->where('publish', 1)
+			->orderBy('sortable', 'asc')
+			->get()
+			->toArray();
 		} else {
-			return DB::table('faqs')->orderBy('id', 'desc')->paginate(15);
+			return DB::table('faqs')
+			->orderBy('id', 'desc')
+			->paginate(15);
 		}
 	}
 
-	public function getTop5FAQsClicks()
+	public static function getFAQsByCategoryAndSubcategory($category, $subcategory)
+	{
+		if($subcategory == '' OR $subcategory == NULL){
+			return DB::table('faqs')
+			->where('kategorie', $category)
+			->where('publish', 1)
+			->orderBy('sortable', 'asc')
+			->get()
+			->toArray();
+		} else {
+			return DB::table('faqs')
+			->where('kategorie', $category)
+			->where('unterkategorie', $subcategory)
+			->where('publish', 1)
+			->orderBy('sortable', 'asc')
+			->get()
+			->toArray();
+		}
+	}
+
+	public static function getTop5FAQsClicks()
 	{
 		return DB::table('faqs')->orderBy('clicks', 'desc')->take(10)->get();
 	}
 
-	public function getFAQsByKey($key)
+	public static function getFAQsByKey($key)
 	{
 		return DB::table('faqs')
 		->where('titel', 'like', '%'.$key.'%')
@@ -269,43 +229,59 @@ class Service extends Model
 		->get();
 	}
 
-
-
-	public function getFAQsWithId($ids){
+	public static function getFAQsWithId($ids)
+	{
 		return DB::table('faqs')->whereIn('id', $ids)->first();
 	}
 
-	public function getDocumentsById($ids){
+	public static function getDocumentsById($ids)
+	{
 		$documents = DB::table('dokumente')->whereIn('id', $ids)->orderByRaw(DB::raw("FIELD(id, ".implode(',', $ids).")"))->paginate();
 		return $documents;
 	}
 
-	public function getHomeDocuments(){
-		// $documents = DB::table('dokumente')->where('publish', 1)->orderBy('sortable', 'asc')->paginate();
-		$documents = DB::table('dokumente')->orderBy('clicks', 'asc')->take(10)->get();
+	public static function getHomeDocuments()
+	{
+		$documents = DB::table('dokumente')->where('publish', 1)->orderBy('sortable', 'asc')->paginate();
 		return $documents;
 	}
 
-	public function getNewDocuments(){
-		// return DB::table('dokumente')->where('datum', '>=', date('Y-m-d', strtotime('-4 weeks', strtotime(date('Y-m-d')))))->orderBy('datum', 'desc')->take(3)->get();
-		return DB::table('dokumente')->orderBy('datum', 'desc')->take(6)->get();
+	public static function getNewDocuments()
+	{
+		return DB::table('dokumente')->orderBy('created_at', 'desc')->take(6)->get();
 	}
 
-	public function getFAQSubcategories($category){
+	public static function getFAQSubcategories($category){
 		if($category == 'Fuhrpark'){
-			return DB::table('faqs')->select('unterkategorie')->where('kategorie', $category)->where('publish', 1)->groupBy('unterkategorie')->orderBy('unterkategorie', 'desc')->get();
+			return DB::table('faqs')
+			->select('unterkategorie')
+			->where('kategorie', $category)
+			->where('publish', 1)
+			->groupBy('unterkategorie')
+			->orderBy('unterkategorie', 'desc')
+			->pluck('unterkategorie')
+			->toArray();
 		} else {
-			return DB::table('faqs')->select('unterkategorie')->where('kategorie', $category)->where('publish', 1)->groupBy('unterkategorie')->get();
+			return DB::table('faqs')
+			->select('unterkategorie')
+			->where('kategorie', $category)
+			->where('publish', 1)
+			->groupBy('unterkategorie')
+			->pluck('unterkategorie')
+			->toArray();
 		}
 	}
 
-	public function getLastDocuments(){
-		$documents = DB::table('dokumente')->orderBy('updated_at', 'desc')->take(6)->get();
-
-		return $documents;
+	public static function getAllFAQCategories(){
+		return DB::table('faqs')
+		->select('kategorie')
+		->where('publish', 1)
+		->groupBy('kategorie')
+		->pluck('kategorie')
+		->toArray();
 	}
 
-	public function getDocumentsSortable(){
+	public static function getDocumentsSortable(){
 		$news = DB::table('dokumente')
 		->where('publish', 1)
 		->orderBy('sortable', 'asc')
@@ -314,27 +290,32 @@ class Service extends Model
 		return $news;
 	}
 
-	public function showFAQs($id)
+	public static function showFAQs($id)
 	{
 		return DB::table('faqs')->where('id', $id)->get()->first();
 	}
 
-	public function showDocument($id)
+	public static function showDocument($id)
 	{
 		return DB::table('dokumente')->where('id', $id)->get()->first();
 	}
 
-	public function getHomepageData()
+	public static function getHomepageData()
 	{
 		return DB::table('homepage')->get()->first();
 	}
 
-	public function getWLANData()
+	public static function getWLANData()
 	{
 		return DB::table('wlan_banner')->get()->first();
 	}
 
-	public function updateFAQPublishStatus($faqId, $status) 
+	public static function getHomeMessage()
+	{
+		return DB::table('home_message')->get()->first();
+	}
+
+	public static function updateFAQPublishStatus($faqId, $status) 
 	{
 		DB::table('faqs')
 		->where('id', $faqId)
@@ -343,7 +324,7 @@ class Service extends Model
 		);
 	}	
 
-	public function updateClicksFAQ($faqId) 
+	public static function updateClicksFAQ($faqId) 
 	{
 		$clicks = DB::table('faqs')
 		->select('clicks')
@@ -355,30 +336,16 @@ class Service extends Model
 		->update([
 			'clicks' => $clicks->clicks + 1]
 		);
-	}
-
-	public function updateClicksDocument($documentId) 
-	{
-		$clicks = DB::table('dokumente')
-		->select('clicks')
-		->where('id', $documentId)
-		->first();
-
-		DB::table('dokumente')
-		->where('id', $documentId)
-		->update([
-			'clicks' => $clicks->clicks + 1]
-		);
 	}	
 
-	public function updateDocument($data) 
+	public static function updateDocument($data) 
 	{
 		if($data['pdf']){
 			$documentOriginalName = $data['pdf']->getClientOriginalName();
 			$pathParts = pathinfo($documentOriginalName);
 			$documentExtension = $pathParts['extension'];
-			$documentFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $data['name'].'.'.$documentExtension));
-			$documentPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/documents/pdf/'.$documentFullName));
+			$documentFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $data['name'].'.'.$documentExtension));
+			$documentPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/documents/pdf/'.$documentFullName));
 			$documentSize = round((File::size($data['pdf'])/1000));
 
 			Storage::disk('public_uploads')->putFileAs('', $data['pdf'], $documentFullName);
@@ -406,12 +373,11 @@ class Service extends Model
 			'name' => $data['name'], 
 			'kategorie' => $data['kategorie'], 
 			'updated_at' => date('Y-m-d H:i:s'),
-			'datum' => $data['datum'], 
 		]);
 
 	}
 
-	public function updateFAQs($data) 
+	public static function updateFAQs($data) 
 	{
 		DB::table('faqs')
 		->where('id', $data['id'])
@@ -423,7 +389,8 @@ class Service extends Model
 		]);
 	}	
 
-	public function updateWLANBanner($data){
+	public static function updateWLANBanner($data)
+	{
 		DB::table('wlan_banner')
 		->where('id', 1)
 		->update([
@@ -432,13 +399,14 @@ class Service extends Model
 		]);
 	}
 
-	public function updateHomepageData($data){
+	public static function updateHomepageData($data)
+	{
 		if($data['wallpaper']){
 			$newsOriginalWallpaperName = $data['wallpaper']->getClientOriginalName();
 			$pathWallpaperParts = pathinfo($newsOriginalWallpaperName);
 			$wallpaperExtension = $pathWallpaperParts['extension'];
-			$wallpaperFullName = $this->transformGermanChars(preg_replace('/\s+/', '', $newsOriginalWallpaperName));
-			$wallpaperPfad = $this->transformGermanChars(preg_replace('/\s+/', '', '/images/wallpaper/'.$wallpaperFullName));
+			$wallpaperFullName = Helper::transformGermanChars(preg_replace('/\s+/', '', $newsOriginalWallpaperName));
+			$wallpaperPfad = Helper::transformGermanChars(preg_replace('/\s+/', '', '/images/wallpaper/'.$wallpaperFullName));
 
 			Storage::disk('public_images_wallpaper')->putFileAs('', $data['wallpaper'], $wallpaperFullName);
 
@@ -459,12 +427,22 @@ class Service extends Model
 		]);
 	}
 
-	public function removeFAQsById($data) 
+	public static function updateHomeMessageData($data)
+	{
+		DB::table('home_message')
+		->where('id', 1)
+		->update([
+			'title' => $data['title'],
+			'message' => $data['message'],
+		]);
+	}
+
+	public static function removeFAQsById($data) 
 	{
 		DB::table('faqs')->where('id', $data['id'])->delete();
 	}
 
-	public function updateFAQsSortable($data)
+	public static function updateFAQsSortable($data)
 	{
 		foreach(json_decode($data) as $faqId => $sortableNr){
 			DB::table('faqs')
@@ -475,7 +453,7 @@ class Service extends Model
 		}
 	}
 
-	public function updateDocumentsSortable($data)
+	public static function updateDocumentsSortable($data)
 	{
 		foreach(json_decode($data) as $documentId => $sortableNr){
 			DB::table('dokumente')
@@ -486,12 +464,7 @@ class Service extends Model
 		}
 	}
 
-	/**
-	 * Update a object status
-	 * 
-	 * @return array
-	 */
-	public function updateDocumentStatus($documentId, $documentStatus) 
+	public static function updateDocumentStatus($documentId, $documentStatus) 
 	{
 		DB::table('dokumente')
 		->where('id', $documentId)
@@ -501,7 +474,7 @@ class Service extends Model
 		);
 	}	
 
-	public function getFAQsSortable()
+	public static function getFAQsSortable()
 	{
 		$faqs = DB::table('faqs')
 		->orderBy('sortable', 'asc')
@@ -526,25 +499,11 @@ class Service extends Model
 		return $newsFaqs;
 	}
 
-	public function getBestFAQs()
+	public static function getBestFAQs()
 	{
 		return DB::table('faqs')
 		->orderBy('clicks', 'desc')
 		->take(3)
 		->get();
 	}
-
-	// CREATE NEW FOLDER WITH HELPER FUNCTIONS !!!
-	function transformGermanChars($string)
-	{
-		$string = str_replace("ä", "ae", $string);
-		$string = str_replace("ü", "ue", $string);
-		$string = str_replace("ö", "oe", $string);
-		$string = str_replace("Ä", "Ae", $string);
-		$string = str_replace("Ü", "Ue", $string);
-		$string = str_replace("Ö", "Oe", $string);
-		$string = str_replace("ß", "ss", $string);
-		$string = str_replace("´", "", $string);
-		return $string;
-	}		
 }

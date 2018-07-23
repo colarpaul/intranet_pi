@@ -68,7 +68,7 @@
                             </li>
                             <li> <a class="waves-effect waves-dark {{ (Route::current()->uri == 'cms/faqs' OR Route::current()->uri == 'cms/faqs/sortable' OR Route::current()->uri == 'cms/faqs/statistics') ? 'active' : ''}}" href="/cms/faqs" aria-expanded="false"><i class="mdi mdi-content-copy"></i><span class="hide-menu">FAQs</span></a>
                             </li>
-                            <li> <a class="waves-effect waves-dark {{ Route::current()->uri == 'cms/homepage' ? 'active' : ''}}" href="/cms/homepage" aria-expanded="false"><i class="mdi mdi-image"></i><span class="hide-menu">Homepage Bild</span></a>
+                            <li> <a class="waves-effect waves-dark {{ Route::current()->uri == 'cms/homepage' ? 'active' : ''}}" href="/cms/homepage" aria-expanded="false"><i class="mdi mdi-image"></i><span class="hide-menu">Homepage</span></a>
                             </li>
                             <li> <a class="waves-effect waves-dark {{ Route::current()->uri == 'cms/wlan' ? 'active' : ''}}" href="/cms/wlan" aria-expanded="false"><i class="mdi mdi-signal-variant"></i><span class="hide-menu">WLAN Settings</span></a>
                             </li>

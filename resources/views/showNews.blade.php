@@ -354,8 +354,6 @@
 	</div>
 </div>
 
-
-@endsection
 <div style="display:none" class="modal-container modal-faq-employee-container">
 	<div class="imageModalEmployee"></div>
 	<div class="nameModalEmployee"><span>Name: </span><span class="spanName"></span></div>
@@ -366,6 +364,8 @@
 	<div class="phoneModalEmployee"><span>Telefon: </span><a class="phone-web spanPhone"></a></div>
 	<div class="emailModalEmployee"><span>Email: </span><a class="mail-web spanEmail"></a></div>
 </div>
+
+@endsection
 
 
 @section('content.js')
